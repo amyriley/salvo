@@ -41,9 +41,13 @@ public class SalvoApplication {
 
 			GamePlayer g1 = new GamePlayer(jBauer, game1);
 			GamePlayer g2 = new GamePlayer(cObrian, game1);
+			GamePlayer g3 = new GamePlayer(kBauer, game2);
+			GamePlayer g4 = new GamePlayer(tAlmeida, game2);
 
 			GamePlayerRepository.save(g1);
 			GamePlayerRepository.save(g2);
+			GamePlayerRepository.save(g3);
+			GamePlayerRepository.save(g4);
 		};
 	}
 
