@@ -1,16 +1,9 @@
 package com.codeoftheweb.salvo;
 
 import org.hibernate.annotations.GenericGenerator;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+
+import javax.persistence.*;
+import java.util.*;
 
 @Entity
 public class GamePlayer {
@@ -30,6 +23,9 @@ public class GamePlayer {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="game_id")
     private Game game;
+
+    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
+    Set<Ship> ships;
 
     public Date getJoinTime() {
         return joinTime;
@@ -69,9 +65,22 @@ public class GamePlayer {
     }
 
     public Map<String, Object> makeGamePlayerDTO() {
-        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+        Map<String, Object> dto = new LinkedHashMap<>();
         dto.put("id", player.getId());
         dto.put("email", player.getUserName());
         return dto;
+    }
+
+    public Set<Ship> getShips() {
+        return ships;
+    }
+
+    public void setShips(Set<Ship> ships) {
+        this.ships = ships;
+    }
+
+    public void addShip(Ship ship) {
+        ship.setGamePlayer(this);
+        ships.add(ship);
     }
 }
