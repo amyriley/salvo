@@ -4,8 +4,6 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.*;
 
-import static java.util.stream.Collectors.toList;
-
 @Entity
 public class Ship {
 
@@ -27,7 +25,6 @@ public class Ship {
 
     public Ship (String type) {
         this.type = type;
-        this.gamePlayer = gamePlayer;
     }
 
     public long getId() {
