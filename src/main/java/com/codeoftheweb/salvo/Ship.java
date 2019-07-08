@@ -15,7 +15,15 @@ public class Ship {
 
     @ElementCollection
     @Column(name="locations")
-    private List<String> locations = new ArrayList<>();
+    private List<String> locations = new ArrayList<>(Arrays.asList("H2", "H3", "H4"));
+
+    public List<String> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
+    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="gamePlayer_id")

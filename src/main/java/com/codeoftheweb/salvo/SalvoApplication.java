@@ -77,7 +77,11 @@ public class SalvoApplication {
 			ShipRepository.save(ship1);
 			GamePlayerRepository.save(g7);
 
-			System.out.println(ship1.getGamePlayer().getPlayer().getUserName());
+			g3.addShip(ship2);
+			g3.addShip(ship3);
+			ShipRepository.save(ship2);
+			ShipRepository.save(ship3);
+			GamePlayerRepository.save(g3);
 		};
 	}
 
