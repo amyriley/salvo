@@ -4,7 +4,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootApplication
 public class SalvoApplication {
@@ -73,15 +77,25 @@ public class SalvoApplication {
 			ShipRepository.save(ship4);
 			ShipRepository.save(ship5);
 
-			g7.addShip(ship1);
-			ShipRepository.save(ship1);
-			GamePlayerRepository.save(g7);
-
-			g3.addShip(ship2);
+			g3.addShip(ship5);
 			g3.addShip(ship3);
-			ShipRepository.save(ship2);
+
+			g7.addShip(ship1);
+
+			List<String> patrolBoatLocations = new ArrayList<>(Arrays.asList("B4", "B5"));
+			ship5.setLocations(patrolBoatLocations);
+
+			List<String> submarineLocations = new ArrayList<>(Arrays.asList("E1", "F1", "G1"));
+			ship3.setLocations(submarineLocations);
+
+			List<String> carrierLocations = new ArrayList<>(Arrays.asList("A1", "B1", "C1"));
+			ship1.setLocations(carrierLocations);
+
+			ShipRepository.save(ship5);
 			ShipRepository.save(ship3);
+			ShipRepository.save(ship1);
 			GamePlayerRepository.save(g3);
+			GamePlayerRepository.save(g7);
 		};
 	}
 

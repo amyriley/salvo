@@ -9,7 +9,7 @@ var request = {
 fetch(url, request)
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        console.log('test');
         renderGames(data);
     })
     .catch(error => {
