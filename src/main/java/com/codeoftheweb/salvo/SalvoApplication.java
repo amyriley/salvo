@@ -18,7 +18,7 @@ public class SalvoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner initData(PlayerRepository PlayerRepository, GameRepository GameRepository, GamePlayerRepository GamePlayerRepository, ShipRepository ShipRepository) {
+	public CommandLineRunner initData(PlayerRepository PlayerRepository, GameRepository GameRepository, GamePlayerRepository GamePlayerRepository, ShipRepository ShipRepository, SalvoRepository SalvoRepository) {
 		return (args) -> {
 
 			Player jBauer = new Player("j.bauer@ctu.gov");
@@ -71,31 +71,77 @@ public class SalvoApplication {
 			Ship ship4 = new Ship("destroyer");
 			Ship ship5 = new Ship("patrol boat");
 
+			Ship ship6 = new Ship("carrier");
+			Ship ship7 = new Ship("battleship");
+			Ship ship8 = new Ship("submarine");
+			Ship ship9 = new Ship("destroyer");
+			Ship ship10 = new Ship("patrol boat");
+
 			ShipRepository.save(ship1);
 			ShipRepository.save(ship2);
 			ShipRepository.save(ship3);
 			ShipRepository.save(ship4);
 			ShipRepository.save(ship5);
+			ShipRepository.save(ship6);
+			ShipRepository.save(ship7);
+			ShipRepository.save(ship8);
+			ShipRepository.save(ship9);
+			ShipRepository.save(ship10);
 
 			g3.addShip(ship5);
 			g3.addShip(ship3);
 
 			g7.addShip(ship1);
 
-			List<String> patrolBoatLocations = new ArrayList<>(Arrays.asList("B4", "B5"));
-			ship5.setLocations(patrolBoatLocations);
+			g1.addShip(ship4);
+			g1.addShip(ship3);
+			g1.addShip(ship5);
 
-			List<String> submarineLocations = new ArrayList<>(Arrays.asList("E1", "F1", "G1"));
-			ship3.setLocations(submarineLocations);
+			g2.addShip(ship9);
+			g2.addShip(ship10);
+
+			List<String> destroyerLocationsJack = new ArrayList<>(Arrays.asList("H2", "H3", "H4"));
+			ship4.setLocations(destroyerLocationsJack);
+
+			List<String> submarineLocationsJack = new ArrayList<>(Arrays.asList("E1", "F1", "G1"));
+			ship3.setLocations(submarineLocationsJack);
+
+			List<String> patrolBoatLocationsJack = new ArrayList<>(Arrays.asList("B4", "B5"));
+			ship5.setLocations(patrolBoatLocationsJack);
 
 			List<String> carrierLocations = new ArrayList<>(Arrays.asList("A1", "B1", "C1"));
 			ship1.setLocations(carrierLocations);
 
+			List<String> destroyerLocationsChloe = new ArrayList<>(Arrays.asList("B5", "C5", "D5"));
+			ship9.setLocations(destroyerLocationsChloe);
+
+			List<String> patrolBoatLocationsChloe = new ArrayList<>(Arrays.asList("F1", "F2"));
+			ship10.setLocations(patrolBoatLocationsChloe);
+
 			ShipRepository.save(ship5);
 			ShipRepository.save(ship3);
 			ShipRepository.save(ship1);
+			ShipRepository.save(ship9);
+			ShipRepository.save(ship10);
 			GamePlayerRepository.save(g3);
 			GamePlayerRepository.save(g7);
+
+			Salvo salvo1Jack = new Salvo(1);
+
+			List<String> salvo1JackLocations = new ArrayList<>(Arrays.asList("B5", "C5", "F1"));
+			salvo1Jack.setLocations(salvo1JackLocations);
+			SalvoRepository.save(salvo1Jack);
+
+			g1.addSalvo(salvo1Jack);
+			GamePlayerRepository.save(g1);
+			SalvoRepository.save(salvo1Jack);
+
+			Salvo salvo1Chloe = new Salvo(1);
+
+			List<String> salvo1ChloeLocations = new ArrayList<>(Arrays.asList("B4", "B5", "B6"));
+			salvo1Chloe.setLocations(salvo1ChloeLocations);
+			GamePlayerRepository.save(g2);
+			SalvoRepository.save(salvo1Chloe);
 		};
 	}
 

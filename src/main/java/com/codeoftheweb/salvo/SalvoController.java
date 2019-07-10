@@ -44,6 +44,7 @@ public class SalvoController {
 
         gameView.put("gamePlayers", gamePlayersList);
         gameView.put("ships", makeShipDTO(gamePlayer));
+        gameView.put("salvos", makeSalvoDTO(gamePlayer));
 
         return gameView;
     }
@@ -89,5 +90,47 @@ public class SalvoController {
         }
 
         return shipList;
+    }
+
+    public List<Map<String, Object>> makeSalvoDTO(GamePlayer gamePlayer) {
+
+        List<Map<String, Object>> salvoList = new ArrayList<>();
+
+        for (Salvo salvo : gamePlayer.getSalvoes()) {
+            Map<String, Object> salvoMap = new LinkedHashMap<>();
+            salvoMap.put("turn", salvo.getTurn());
+            salvoMap.put("id", makeSalvoIdDTO(gamePlayer));
+            salvoList.add(salvoMap);
+        }
+
+        return salvoList;
+    }
+
+    public List<Map<String, Object>> makeSalvoIdDTO(GamePlayer gamePlayer) {
+
+        List<Map<String, Object>> salvoIdList = new ArrayList<>();
+
+        for (Salvo salvo : gamePlayer.getSalvoes()) {
+            Map<String, Object> salvoIdMap = new LinkedHashMap<>();
+            salvoIdMap.put("gamePlayerId", salvo.getGamePlayer().getId());
+//            salvoIdMap.put("test", makeSalvoLocationsDTO(gamePlayer));
+            salvoIdList.add(salvoIdMap);
+        }
+
+
+        return salvoIdList;
+    }
+
+    public List<Map<String, Object>> makeSalvoLocationsDTO(GamePlayer gamePlayer) {
+
+        List<Map<String, Object>> salvoLocationsList = new ArrayList<>();
+
+        for (Salvo salvo : gamePlayer.getSalvoes()) {
+            Map<String, Object> salvoLocationsMap = new LinkedHashMap<>();
+            salvoLocationsMap.put("locations", salvo.getLocations());
+            salvoLocationsList.add(salvoLocationsMap);
+        }
+
+        return salvoLocationsList;
     }
 }

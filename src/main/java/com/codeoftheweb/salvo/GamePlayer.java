@@ -27,6 +27,9 @@ public class GamePlayer {
     @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
     Set<Ship> ships = new HashSet<>();
 
+    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
+    Set<Salvo> salvoes = new HashSet<>();
+
     public Date getJoinTime() {
         return joinTime;
     }
@@ -79,8 +82,21 @@ public class GamePlayer {
         this.ships = ships;
     }
 
+    public Set<Salvo> getSalvoes() {
+        return salvoes;
+    }
+
+    public void setSalvoes(Set<Salvo> salvoes) {
+        this.salvoes = salvoes;
+    }
+
     public void addShip(Ship ship) {
         ship.setGamePlayer(this);
         ships.add(ship);
+    }
+
+    public void addSalvo(Salvo salvo) {
+        salvo.setGamePlayer(this);
+        salvoes.add(salvo);
     }
 }
