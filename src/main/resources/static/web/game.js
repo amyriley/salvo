@@ -38,7 +38,15 @@ fetch(url, request)
     })
 
 function changeGamePlayerHeader(data) {
-    document.getElementById("gamePlayerHeader").innerHTML = data.gamePlayers.map(gamePlayer => gamePlayer.player.email);
+
+    for (var i = 0; i < data.gamePlayers.length; i++) {
+        var gamePlayerHeader = data.gamePlayers.player.email;
+        console.log("test");
+
+        if (data.gamePlayers.id === gamePlayerId) {
+            document.getElementById("gamePlayerHeader").innerHTML = gamePlayerHeader + "(you";
+        }
+    }
 }
 
 function getHeadersHtml(headers) {
@@ -52,7 +60,7 @@ function renderHeaders(headers) {
   document.getElementById("table-headers").innerHTML = html;
 }
 
-function getColumnsHtml(letter, shipLocations) {
+function getColumnsHtml(letter) {
   return headers.map(function(number) {
     return `<td style='width: 50px' id='${letter + number}'></td>`;
   }).join("")

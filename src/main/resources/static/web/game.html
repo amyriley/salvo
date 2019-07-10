@@ -7,19 +7,27 @@
     <title>Ship Locations!</title>
 </head>
 <body>
-    <div class="container">
-        <h3 id="gamePlayerHeader">Game Player X</h3>
-        <table id="gameTable" class="table table-bordered" style="width: 550px">
-            <thead id="table-headers">
-            </thead>
-            <tbody id="table-rows">
-            </tbody>
-        </table>
+    <div id="app">
+        <div class="container">
+            <h3 id="gamePlayerHeader">Game Player X</h3>
+            <table id="gameTable" class="table table-bordered" style="width: 550px">
+                <thead id="table-headers">
+                    <tr>
+                        <th></th>
+                        <th v-for="number in headers">{{number}}</th>
+                    </tr>
+                </thead>
+                <tbody v-for="letter in rows" id="table-rows">
+                        <th>{{letter}}</th>
+                        <td style='width: 50px' v-for="number in headers" :id="letter + number"></td>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-<script type="text/javascript" src="game.js"></script>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script type="text/javascript" src="main.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-</body>
 </html>
