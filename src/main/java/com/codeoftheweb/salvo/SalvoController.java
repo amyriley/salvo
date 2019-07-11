@@ -44,7 +44,7 @@ public class SalvoController {
 
         gameView.put("gamePlayers", gamePlayersList);
         gameView.put("ships", makeShipDTO(gamePlayer));
-        gameView.put("salvos", makeSalvoDTO(gamePlayer));
+        gameView.put("salvos", makeGamePlayerSalvoDTO(gamePlayer));
 
         return gameView;
     }
@@ -98,39 +98,26 @@ public class SalvoController {
 
         for (Salvo salvo : gamePlayer.getSalvoes()) {
             Map<String, Object> salvoMap = new LinkedHashMap<>();
-            salvoMap.put("turn", salvo.getTurn());
-            salvoMap.put("id", makeSalvoIdDTO(gamePlayer));
+            salvoMap.put("turnNumber", salvo.getTurn());
+            salvoMap.put("locations", salvo.getLocations());
+
             salvoList.add(salvoMap);
         }
 
         return salvoList;
     }
 
-    public List<Map<String, Object>> makeSalvoIdDTO(GamePlayer gamePlayer) {
+    public List<Map<String, Object>> makeGamePlayerSalvoDTO(GamePlayer gamePlayer) {
 
-        List<Map<String, Object>> salvoIdList = new ArrayList<>();
+        List<Map<String, Object>> gamePlayersList = new ArrayList<>();
 
-        for (Salvo salvo : gamePlayer.getSalvoes()) {
-            Map<String, Object> salvoIdMap = new LinkedHashMap<>();
-            salvoIdMap.put("gamePlayerId", salvo.getGamePlayer().getId());
-//            salvoIdMap.put("test", makeSalvoLocationsDTO(gamePlayer));
-            salvoIdList.add(salvoIdMap);
+        for (GamePlayer player : gamePlayer.getGame().getGamePlayers()) {
+            Map<String, Object> gamePlayerMap = new LinkedHashMap<>();
+            gamePlayerMap.put("gamePlayerId", player.getId());
+            gamePlayerMap.put("turns", makeSalvoDTO(player));
+            gamePlayersList.add(gamePlayerMap);
         }
 
-
-        return salvoIdList;
-    }
-
-    public List<Map<String, Object>> makeSalvoLocationsDTO(GamePlayer gamePlayer) {
-
-        List<Map<String, Object>> salvoLocationsList = new ArrayList<>();
-
-        for (Salvo salvo : gamePlayer.getSalvoes()) {
-            Map<String, Object> salvoLocationsMap = new LinkedHashMap<>();
-            salvoLocationsMap.put("locations", salvo.getLocations());
-            salvoLocationsList.add(salvoLocationsMap);
-        }
-
-        return salvoLocationsList;
+        return gamePlayersList;
     }
 }

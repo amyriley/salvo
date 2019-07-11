@@ -127,21 +127,38 @@ public class SalvoApplication {
 			GamePlayerRepository.save(g7);
 
 			Salvo salvo1Jack = new Salvo(1);
+			Salvo salvo2Jack = new Salvo(2);
 
 			List<String> salvo1JackLocations = new ArrayList<>(Arrays.asList("B5", "C5", "F1"));
 			salvo1Jack.setLocations(salvo1JackLocations);
 			SalvoRepository.save(salvo1Jack);
 
+			List<String> salvo2JackLocations = new ArrayList<>(Arrays.asList("F2", "D5"));
+			salvo2Jack.setLocations(salvo2JackLocations);
+			SalvoRepository.save(salvo2Jack);
+
 			g1.addSalvo(salvo1Jack);
+			g1.addSalvo(salvo2Jack);
 			GamePlayerRepository.save(g1);
 			SalvoRepository.save(salvo1Jack);
+			SalvoRepository.save(salvo2Jack);
 
 			Salvo salvo1Chloe = new Salvo(1);
+			Salvo salvo2Chloe = new Salvo(2);
 
 			List<String> salvo1ChloeLocations = new ArrayList<>(Arrays.asList("B4", "B5", "B6"));
 			salvo1Chloe.setLocations(salvo1ChloeLocations);
+			SalvoRepository.save(salvo1Chloe);
+
+			List<String> salvo2ChloeLocations = new ArrayList<>(Arrays.asList("E1", "H3", "A2"));
+			salvo2Chloe.setLocations(salvo2ChloeLocations);
+			SalvoRepository.save(salvo2Chloe);
+
+			g2.addSalvo(salvo1Chloe);
+			g2.addSalvo(salvo2Chloe);
 			GamePlayerRepository.save(g2);
 			SalvoRepository.save(salvo1Chloe);
+			SalvoRepository.save(salvo2Chloe);
 		};
 	}
 
