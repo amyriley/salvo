@@ -20,7 +20,9 @@ var app = new Vue({
                 .then(data => {
                     console.log(data);
                     this.setShipPositions(data);
-                    this.setSalvoPositions(data);
+                    this.setSalvoesFiredByGamePlayerId(data);
+                    this.getSalvoesFiredByOpponent(data);
+                    this.setHitPositions(data);
                     this.changeGamePlayerHeader(data);
                 })
                 .catch(error => {
@@ -44,39 +46,8 @@ var app = new Vue({
                 var locations = ships[i].locations;
                 locations.forEach((x) => shipLocations.push(x));
             }
-        
+
            return shipLocations;
-        },
-        getSalvoLocations: function(data) {
-            var salvoes = data.salvoes;
-            console.log(data.salvoes.gamePlayers[0].turns[0].locations);
-            var salvoLocations = [];
-
-            for (var i = 0; i < salvoes.length; i++) {
-                var locations = salvoes[i].turns[0].locations;
-                console.log("locations" + locations);
-                locations.forEach((x) => salvoLocations.push(x));
-            }
-        
-           return salvoLocations;
-        },
-        setSalvoPositions: function(data) {
-            var salvoLocations = this.getSalvoLocations(data);
-            var table = document.getElementById('salvoTable');
-            var targetTDs = table.querySelectorAll('td');
-
-            for (var i = 0; i < targetTDs.length; i++) {
-                var tdId = targetTDs[i].id;
-
-                for (var j = 0; j < salvoLocations.length; j++) {
-                    var salvoLocation = salvoLocations[j];
-
-                    if (tdId === salvoLocation) {
-                        targetTDs[i].style.backgroundColor = "red";
-                        targetTDs[i].innerHTML = "x";
-                    }
-                }
-            }
         },
         setShipPositions: function(data) {
             var shipLocations = this.getShipLocations(data);
@@ -91,6 +62,88 @@ var app = new Vue({
         
                     if (tdId === shipLocation) {
                         targetTDs[i].style.backgroundColor = "yellow";
+                    }
+                }
+            }
+        },
+        getSalvoesFiredByGamePlayerId: function(data) {
+            var gamePlayers = data.gamePlayers;
+            var salvoesFiredByGamePlayerId = [];
+
+            for (var i = 0; i < gamePlayers.length; i++) {
+
+                if (gamePlayers[i].id == this.gamePlayerId) {
+                    var salvoes = gamePlayers[i].salvoes;
+                    salvoes.forEach((x) => salvoesFiredByGamePlayerId.push(x.locations));
+                }
+            }
+
+            salvoesFiredByGamePlayerId = Array.prototype.concat.apply([], salvoesFiredByGamePlayerId);
+
+            return salvoesFiredByGamePlayerId;
+        },
+        getSalvoesFiredByOpponent: function(data) {
+            var gamePlayers = data.gamePlayers;
+            var salvoesFiredByOpponent = [];
+
+            for (var i = 0; i < gamePlayers.length; i++) {
+
+                if (gamePlayers[i].id != this.gamePlayerId) {
+                    var salvoes = gamePlayers[i].salvoes;
+                    salvoes.forEach((x) => salvoesFiredByOpponent.push(x.locations));
+                }
+            }
+
+            salvoesFiredByOpponent = Array.prototype.concat.apply([], salvoesFiredByOpponent);
+
+            return salvoesFiredByOpponent;
+        },
+        setSalvoesFiredByGamePlayerId: function(data) {
+            var salvoLocations = this.getSalvoesFiredByGamePlayerId(data);
+            var table = document.getElementById('salvoTable');
+            var targetTDs = table.querySelectorAll('td');
+        
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+        
+                for (var j = 0; j < salvoLocations.length; j++) {
+                    var salvoLocation = salvoLocations[j];
+
+                    if (tdId === salvoLocation) {
+                        targetTDs[i].style.backgroundColor = "red";
+                    }
+                }
+            }
+        },
+        getOpponentHits: function(data) {
+            var opponentSalvoLocations = this.getSalvoesFiredByOpponent(data);
+            var shipLocations = this.getShipLocations(data);
+            var hits = [];
+
+            for (var i = 0; i < opponentSalvoLocations.length; i++) {
+
+                for (var j = 0; j < shipLocations.length; j++) {
+                    if (opponentSalvoLocations[i] === shipLocations[j]) {
+                        hits.push(opponentSalvoLocations[i]);
+                    }
+                }
+            }
+
+            return hits;
+        },
+        setHitPositions: function(data) {
+            var hitsToShow = this.getOpponentHits(data);
+            var table = document.getElementById('gameTable');
+            var targetTDs = table.querySelectorAll('td');
+        
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+        
+                for (var j = 0; j < hitsToShow.length; j++) {
+                    var hitLocation = hitsToShow[j];
+        
+                    if (tdId === hitLocation) {
+                        targetTDs[i].innerHTML = "x";
                     }
                 }
             }

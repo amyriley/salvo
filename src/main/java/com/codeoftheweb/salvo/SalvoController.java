@@ -33,7 +33,6 @@ public class SalvoController {
     public GameDto getOneGame(@PathVariable Long gamePlayerId) {
 
         GameDto dto = new GameDto();
-
         GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
 
         List<GamePlayerDto> gamePlayerDtos = gamePlayer.getGame().getGamePlayers()

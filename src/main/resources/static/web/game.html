@@ -19,12 +19,12 @@
                 </thead>
                 <tbody v-for="letter in rows" id="table-rows-game">
                         <th>{{letter}}</th>
-                        <td style='width: 50px' v-for="number in headers" :id="letter + number"></td>
+                        <td class="text-sm-center" style='width: 50px' v-for="number in headers" :id="letter + number"></td>
                 </tbody>
             </table>
         </div>
         <div class="container">
-            <h4>Salvoes fired...</h4>
+            <h4>Salvoes fired by you...</h4>
             <table id="salvoTable" class="table table-bordered" style="width: 550px">
                     <thead id="table-headers-salvo">
                         <tr>
