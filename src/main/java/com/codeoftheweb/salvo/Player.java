@@ -47,10 +47,10 @@ public class Player {
         return gamePlayers.stream().map(g -> g.getGame()).collect(toList());
     }
 
-    public Map<String, Object> makePlayerDTO() {
-        Map<String, Object> dto = new LinkedHashMap<String, Object>();
-        dto.put("id", getId());
-        dto.put("email", getUserName());
-        return dto;
-    }
+//    public Map<String, Object> makePlayerDTO() {
+//        Map<String, Object> dto = new LinkedHashMap<String, Object>();
+//        dto.put("id", getId());
+//        dto.put("email", getUserName());
+//        return dto;
+//    }
 }

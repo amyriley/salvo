@@ -119,6 +119,7 @@ public class SalvoApplication {
 			ship10.setLocations(patrolBoatLocationsChloe);
 
 			ShipRepository.save(ship5);
+			ShipRepository.save(ship4);
 			ShipRepository.save(ship3);
 			ShipRepository.save(ship1);
 			ShipRepository.save(ship9);

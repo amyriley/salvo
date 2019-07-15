@@ -37,14 +37,6 @@ public class Salvo {
         this.id = id;
     }
 
-    public GamePlayer getGamePlayer() {
-        return gamePlayer;
-    }
-
-    public void setGamePlayer(GamePlayer gamePlayer) {
-        this.gamePlayer = gamePlayer;
-    }
-
     public int getTurn() {
         return turn;
     }
@@ -59,5 +51,19 @@ public class Salvo {
 
     public void setLocations(List<String> locations) {
         this.locations = locations;
+    }
+
+    public GamePlayer getGamePlayer() {
+        return gamePlayer;
+    }
+
+    public void setGamePlayer(GamePlayer gamePlayer) {
+        this.gamePlayer = gamePlayer;
+    }
+
+    public Map<String, Object> salvoDTO() {
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("turn", turn);
+        return dto;
     }
 }

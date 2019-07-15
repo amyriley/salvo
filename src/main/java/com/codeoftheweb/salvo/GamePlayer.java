@@ -14,21 +14,27 @@ public class GamePlayer {
     private long id;
     private Date joinTime = new Date();
 
-    public GamePlayer() { }
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="player_id")
+    @JoinColumn(name = "player_id")
     private Player player;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="game_id")
+    @JoinColumn(name = "game_id")
     private Game game;
 
-    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
-    Set<Ship> ships = new HashSet<>();
+    @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
+    private Set<Ship> ships = new HashSet<>();
 
-    @OneToMany(mappedBy="gamePlayer", fetch=FetchType.EAGER)
-    Set<Salvo> salvoes = new HashSet<>();
+    @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
+    private Set<Salvo> salvoes = new HashSet<>();
+
+    public GamePlayer() {
+    }
+
+    public GamePlayer(Player player, Game game) {
+        this.player = player;
+        this.game = game;
+    }
 
     public Date getJoinTime() {
         return joinTime;
@@ -36,11 +42,6 @@ public class GamePlayer {
 
     public void setJoinTime(Date creationTime) {
         this.joinTime = creationTime;
-    }
-
-    public GamePlayer(Player player, Game game) {
-        this.player = player;
-        this.game = game;
     }
 
     public long getId() {
@@ -67,12 +68,15 @@ public class GamePlayer {
         this.game = game;
     }
 
-    public Map<String, Object> makeGamePlayerDTO() {
-        Map<String, Object> dto = new LinkedHashMap<>();
-        dto.put("id", player.getId());
-        dto.put("email", player.getUserName());
-        return dto;
-    }
+//    public Map<String, Game> makeGamePlayerDTO() {
+
+//        Map<String, Object> dto = new LinkedHashMap<>();
+//        dto.put("id", player.getId());
+//        dto.put("email", player.getUserName());
+//        return dto;
+
+//        return new HashMap<>();
+//    }
 
     public Set<Ship> getShips() {
         return ships;

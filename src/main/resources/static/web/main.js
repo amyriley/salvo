@@ -19,7 +19,8 @@ var app = new Vue({
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    this.setGridColors(data);
+                    this.setShipPositions(data);
+                    this.setSalvoPositions(data);
                     this.changeGamePlayerHeader(data);
                 })
                 .catch(error => {
@@ -46,7 +47,38 @@ var app = new Vue({
         
            return shipLocations;
         },
-        setGridColors: function(data) {
+        getSalvoLocations: function(data) {
+            var salvoes = data.salvoes;
+            console.log(data.salvoes.gamePlayers[0].turns[0].locations);
+            var salvoLocations = [];
+
+            for (var i = 0; i < salvoes.length; i++) {
+                var locations = salvoes[i].turns[0].locations;
+                console.log("locations" + locations);
+                locations.forEach((x) => salvoLocations.push(x));
+            }
+        
+           return salvoLocations;
+        },
+        setSalvoPositions: function(data) {
+            var salvoLocations = this.getSalvoLocations(data);
+            var table = document.getElementById('salvoTable');
+            var targetTDs = table.querySelectorAll('td');
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+
+                for (var j = 0; j < salvoLocations.length; j++) {
+                    var salvoLocation = salvoLocations[j];
+
+                    if (tdId === salvoLocation) {
+                        targetTDs[i].style.backgroundColor = "red";
+                        targetTDs[i].innerHTML = "x";
+                    }
+                }
+            }
+        },
+        setShipPositions: function(data) {
             var shipLocations = this.getShipLocations(data);
             var table = document.getElementById('gameTable');
             var targetTDs = table.querySelectorAll('td');
@@ -64,7 +96,6 @@ var app = new Vue({
             }
         },
         changeGamePlayerHeader: function(data) {
-
             var emails = [];
             var gamePlayerHeader = document.getElementById("gamePlayerHeader");
 
@@ -75,7 +106,7 @@ var app = new Vue({
                 if (id == this.gamePlayerId) {
                     emails.push(email + " (you)")
                 } else {
-                    emails.push(" " +email + " ");
+                    emails.push(" " + email + " ");
                 }
             }
 
