@@ -68,19 +68,38 @@ var app = new Vue({
         },
         getSalvoesFiredByGamePlayerId: function(data) {
             var gamePlayers = data.gamePlayers;
-            var salvoesFiredByGamePlayerId = [];
+            var salvoesList = [];
 
             for (var i = 0; i < gamePlayers.length; i++) {
 
                 if (gamePlayers[i].id == this.gamePlayerId) {
                     var salvoes = gamePlayers[i].salvoes;
-                    salvoes.forEach((x) => salvoesFiredByGamePlayerId.push(x.locations));
+                    salvoes.forEach((x) => salvoesList.push(x));
                 }
             }
+            
+            return salvoes;
+        },
+        setSalvoesFiredByGamePlayerId: function(data) {
+            var salvoes = this.getSalvoesFiredByGamePlayerId(data);
+            var table = document.getElementById('salvoTable');
+            var targetTDs = table.querySelectorAll('td');
+        
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+        
+                for (var j = 0; j < salvoes.length; j++) {
+                    var salvoLocations = salvoes[j].locations;
+                    var salvoTurn = salvoes[j].turn;
 
-            salvoesFiredByGamePlayerId = Array.prototype.concat.apply([], salvoesFiredByGamePlayerId);
-
-            return salvoesFiredByGamePlayerId;
+                    for (var k = 0; k < salvoLocations.length; k++) {
+                        if (tdId === salvoLocations[k]) {
+                            targetTDs[i].style.backgroundColor = "green";
+                            targetTDs[i].innerHTML = salvoTurn;
+                        }
+                    }
+                }
+            }
         },
         getSalvoesFiredByOpponent: function(data) {
             var gamePlayers = data.gamePlayers;
@@ -90,43 +109,30 @@ var app = new Vue({
 
                 if (gamePlayers[i].id != this.gamePlayerId) {
                     var salvoes = gamePlayers[i].salvoes;
-                    salvoes.forEach((x) => salvoesFiredByOpponent.push(x.locations));
+                    salvoes.forEach((x) => salvoesFiredByOpponent.push(x));
                 }
             }
-
-            salvoesFiredByOpponent = Array.prototype.concat.apply([], salvoesFiredByOpponent);
-
+            
             return salvoesFiredByOpponent;
         },
-        setSalvoesFiredByGamePlayerId: function(data) {
-            var salvoLocations = this.getSalvoesFiredByGamePlayerId(data);
-            var table = document.getElementById('salvoTable');
-            var targetTDs = table.querySelectorAll('td');
-        
-            for (var i = 0; i < targetTDs.length; i++) {
-                var tdId = targetTDs[i].id;
-        
-                for (var j = 0; j < salvoLocations.length; j++) {
-                    var salvoLocation = salvoLocations[j];
-
-                    if (tdId === salvoLocation) {
-                        targetTDs[i].style.backgroundColor = "red";
-                    }
-                }
-            }
-        },
         getOpponentHits: function(data) {
-            var opponentSalvoLocations = this.getSalvoesFiredByOpponent(data);
+            var opponentSalvoes = this.getSalvoesFiredByOpponent(data);
             var shipLocations = this.getShipLocations(data);
             var hits = [];
 
-            for (var i = 0; i < opponentSalvoLocations.length; i++) {
+            for (var i = 0; i < shipLocations.length; i++) {
+                var ship = shipLocations[i];
 
-                for (var j = 0; j < shipLocations.length; j++) {
-                    if (opponentSalvoLocations[i] === shipLocations[j]) {
-                        hits.push(opponentSalvoLocations[i]);
+                for (var j = 0; j < opponentSalvoes.length; j++) {
+                    var salvoLocations = opponentSalvoes[j].locations;
+                    var salvoTurn = opponentSalvoes[j].turn;
+
+                    for (var k = 0; k < salvoLocations.length; k++) {
+                        if (ship === salvoLocations[k]) {
+                            hits.push({locations: salvoLocations[k], turn: salvoTurn});
+                        }
                     }
-                }
+                } 
             }
 
             return hits;
@@ -140,10 +146,12 @@ var app = new Vue({
                 var tdId = targetTDs[i].id;
         
                 for (var j = 0; j < hitsToShow.length; j++) {
-                    var hitLocation = hitsToShow[j];
-        
-                    if (tdId === hitLocation) {
-                        targetTDs[i].innerHTML = "x";
+                    var salvoLocations = hitsToShow[j].locations;
+                    var salvoTurn = hitsToShow[j].turn;
+
+                    if (tdId === salvoLocations) {
+                        targetTDs[i].style.backgroundColor = "red";
+                        targetTDs[i].innerHTML = salvoTurn;
                     }
                 }
             }
