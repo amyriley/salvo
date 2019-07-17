@@ -13,14 +13,19 @@ public class Player {
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
     private String userName;
+    private String password;
 
     @OneToMany(mappedBy="player", fetch=FetchType.EAGER)
     Set<GamePlayer> gamePlayers;
 
+    @OneToMany(mappedBy="player", fetch=FetchType.EAGER)
+    Set<Score> scores = new HashSet<>();
+
     public Player() {}
 
-    public Player(String userName) {
+    public Player(String userName, String password) {
         this.userName = userName;
+        this.password = password;
     }
 
     public long getId() {
@@ -47,10 +52,24 @@ public class Player {
         return gamePlayers.stream().map(g -> g.getGame()).collect(toList());
     }
 
-//    public Map<String, Object> makePlayerDTO() {
-//        Map<String, Object> dto = new LinkedHashMap<String, Object>();
-//        dto.put("id", getId());
-//        dto.put("email", getUserName());
-//        return dto;
-//    }
+    public Set<Score> getScores() {
+        return scores;
+    }
+
+    public void setScores(Set<Score> scores) {
+        this.scores = scores;
+    }
+
+    public void addScore(Score score) {
+        score.setPlayer(this);
+        scores.add(score);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

@@ -68,16 +68,6 @@ public class GamePlayer {
         this.game = game;
     }
 
-//    public Map<String, Game> makeGamePlayerDTO() {
-
-//        Map<String, Object> dto = new LinkedHashMap<>();
-//        dto.put("id", player.getId());
-//        dto.put("email", player.getUserName());
-//        return dto;
-
-//        return new HashMap<>();
-//    }
-
     public Set<Ship> getShips() {
         return ships;
     }

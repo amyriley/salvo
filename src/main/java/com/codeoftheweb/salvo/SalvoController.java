@@ -5,11 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.toList;
 
 @RestController
@@ -45,10 +41,16 @@ public class SalvoController {
                 .map(ship -> makeShipDto(ship))
                 .collect(toList());
 
+        List<ScoreDto> scoreDtos = gamePlayer.getGame().getScores()
+                .stream()
+                .map(score -> makeScoreDto(score))
+                .collect(toList());
+
         dto.setId(gamePlayer.getGame().getId());
         dto.setCreated(gamePlayer.getGame().getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
+        dto.setScores(scoreDtos);
 
         return dto;
     }
@@ -84,10 +86,16 @@ public class SalvoController {
                 .map(gamePlayer -> makeGamePlayerDto(gamePlayer))
                 .collect(toList());
 
+        List<ScoreDto> scoreDtos = game.getScores()
+                .stream()
+                .map(score -> makeScoreDto(score))
+                .collect(toList());
+
         GameDto dto = new GameDto();
         dto.setId(game.getId());
         dto.setCreated(game.getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
+        dto.setScores(scoreDtos);
 
         return dto;
     }
@@ -115,6 +123,17 @@ public class SalvoController {
         ShipDto dto = new ShipDto();
         dto.setType(ship.getType());
         dto.setLocations(ship.getLocations());
+
+        return dto;
+    }
+
+    private ScoreDto makeScoreDto(Score score) {
+
+        ScoreDto dto = new ScoreDto();
+        dto.setPlayerId(score.getPlayer().getId());
+        dto.setPlayerName(score.getPlayer().getUserName());
+        dto.setResult(score.getResult());
+        dto.setFinishDate(score.getFinishDate());
 
         return dto;
     }

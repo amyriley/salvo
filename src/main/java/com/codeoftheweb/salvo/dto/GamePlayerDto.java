@@ -1,12 +1,6 @@
 package com.codeoftheweb.salvo.dto;
 
-import com.codeoftheweb.salvo.Game;
-import com.codeoftheweb.salvo.Player;
-import com.codeoftheweb.salvo.Salvo;
-
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class GamePlayerDto {
 
@@ -39,4 +33,5 @@ public class GamePlayerDto {
     public void setId(long id) {
         this.id = id;
     }
+
 }

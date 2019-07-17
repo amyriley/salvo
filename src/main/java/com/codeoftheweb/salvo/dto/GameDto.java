@@ -9,6 +9,7 @@ public class GameDto {
     private Date created;
     private List<GamePlayerDto> gamePlayers;
     private List<ShipDto> ships;
+    private List<ScoreDto> scores;
 
     public List<ShipDto> getShips() {
         return ships;
@@ -40,5 +41,13 @@ public class GameDto {
 
     public void setGamePlayers(List<GamePlayerDto> gamePlayers) {
         this.gamePlayers = gamePlayers;
+    }
+
+    public List<ScoreDto> getScores() {
+        return scores;
+    }
+
+    public void setScores(List<ScoreDto> scores) {
+        this.scores = scores;
     }
 }

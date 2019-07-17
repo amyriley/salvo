@@ -18,14 +18,14 @@ public class SalvoApplication {
 	}
 
 	@Bean
-	public CommandLineRunner initData(PlayerRepository PlayerRepository, GameRepository GameRepository, GamePlayerRepository GamePlayerRepository, ShipRepository ShipRepository, SalvoRepository SalvoRepository) {
+	public CommandLineRunner initData(PlayerRepository PlayerRepository, GameRepository GameRepository, GamePlayerRepository GamePlayerRepository, ShipRepository ShipRepository, SalvoRepository SalvoRepository, ScoreRepository ScoreRepository) {
 		return (args) -> {
 
-			Player jBauer = new Player("j.bauer@ctu.gov");
-			Player cObrian = new Player("c.obrian@ctu.gov");
-			Player kBauer = new Player("kim_bauer@gmail.com");
-			Player tAlmeida = new Player("t.almeida@ctu.gov");
-			Player dPalmer = new Player("d.palmer@whitehouse.gov");
+			Player jBauer = new Player("j.bauer@ctu.gov", "24");
+			Player cObrian = new Player("c.obrian@ctu.gov", "42");
+			Player kBauer = new Player("kim_bauer@gmail.com", "kb");
+			Player tAlmeida = new Player("t.almeida@ctu.gov", "mole");
+			Player dPalmer = new Player("d.palmer@whitehouse.gov", "eagle");
 
 			PlayerRepository.save(jBauer);
 			PlayerRepository.save(cObrian);
@@ -160,6 +160,49 @@ public class SalvoApplication {
 			GamePlayerRepository.save(g2);
 			SalvoRepository.save(salvo1Chloe);
 			SalvoRepository.save(salvo2Chloe);
+
+			Score score1 = new Score(0);
+			score1.setGame(game1);
+			score1.setPlayer(jBauer);
+			ScoreRepository.save(score1);
+
+			jBauer.addScore(score1);
+			PlayerRepository.save(jBauer);
+
+			Score score2 = new Score(1);
+			score2.setGame(game1);
+			score2.setPlayer(cObrian);
+			ScoreRepository.save(score2);
+			PlayerRepository.save(cObrian);
+			GameRepository.save(game1);
+
+			Score score3 = new Score(0.5);
+			Score score4 = new Score(0.5);
+
+			Score score5 = new Score(1);
+			Score score6 = new Score(1);
+
+			score3.setGame(game2);
+			score4.setGame(game2);
+			score3.setPlayer(tAlmeida);
+			score4.setPlayer(kBauer);
+
+			score5.setGame(game3);
+			score6.setGame(game3);
+			score5.setPlayer(jBauer);
+			score6.setPlayer(kBauer);
+
+			ScoreRepository.save(score3);
+			ScoreRepository.save(score4);
+			ScoreRepository.save(score5);
+			ScoreRepository.save(score6);
+
+			PlayerRepository.save(tAlmeida);
+			PlayerRepository.save(kBauer);
+			PlayerRepository.save(jBauer);
+
+			GameRepository.save(game2);
+			GameRepository.save(game3);
 		};
 	}
 

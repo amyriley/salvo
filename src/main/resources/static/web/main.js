@@ -4,30 +4,181 @@ var app = new Vue({
         headers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
         gamePlayerId: "",
+        leaderboard: ["Name", "Total", "Won", "Lost", "Tied"],
+        uniquePlayers: [],
+        results: [],
+        scores: [],
+        players: [],
     },
     methods: {
         fetchData: function() {
-            var data;
-            var url = "/api/game_view/" + this.gamePlayerId;
+            if (document.title === "Ship Locations!") {
+                var data;
+                var url = "/api/game_view/" + this.gamePlayerId;
+    
+                var request = {
+                    method: 'GET',
+                    body: JSON.stringify(data),
+                };
+    
+                fetch(url, request)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        this.setShipPositions(data);
+                        this.setSalvoesFiredByGamePlayerId(data);
+                        this.getSalvoesFiredByOpponent(data);
+                        this.setHitPositions(data);
+                        this.changeGamePlayerHeader(data);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            }
+        },
+        fetchGames: function() {
+            if (document.title === "Salvo!") {
+                var games;
+                var url = "/api/games";
+    
+                var request = {
+                    method: 'GET',
+                    body: JSON.stringify(games),
+                };
+    
+                fetch(url, request)
+                    .then(response => response.json())
+                    .then(games => {
+                        console.log(games);
+                        this.getPlayers(games);
+                        this.getWinCount("j.bauer@ctu.gov")
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            }
+        },
+        getScores: function(games) {
+            var scores = [];
 
-            var request = {
-                method: 'GET',
-                body: JSON.stringify(data),
-            };
+            for (var i = 0; i < games.length; i++) {
+                var score = games[i].scores;
+                score.forEach((score) => scores.push(score));
+            }
 
-            fetch(url, request)
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    this.setShipPositions(data);
-                    this.setSalvoesFiredByGamePlayerId(data);
-                    this.getSalvoesFiredByOpponent(data);
-                    this.setHitPositions(data);
-                    this.changeGamePlayerHeader(data);
-                })
-                .catch(error => {
-                    console.log(error);
-                })
+            this.scores = scores;
+
+            return scores;
+        },
+        getPlayers: function(games) {
+            var scores = this.getScores(games);
+            var results = [];
+            var players = [];
+
+            for (var i = 0; i < scores.length; i++) {
+                var result = scores[i];
+                players.push({player: result.playerName, total: this.getTotals(result.playerName), 
+                    wins: this.getWinCount(result.playerName), losses: this.getLoseCount(result.playerName),
+                    ties: this.getTieCount(result.playerName)});
+            }
+           
+            var uniquePlayers = this.removeDuplicates(players, "player");
+            uniquePlayers.sort((a, b) => (a.total < b.total) ? 1 : -1)
+
+
+            this.players = players;
+            this.results = results;
+            this.scores = scores;
+            this.uniquePlayers = uniquePlayers;
+
+            return uniquePlayers;
+        },
+        removeDuplicates: function(originalArray, prop) {
+            var newArray = [];
+            var lookupObject  = {};
+        
+            for(var i in originalArray) {
+                lookupObject[originalArray[i][prop]] = originalArray[i];
+            }
+        
+            for(i in lookupObject) {
+                newArray.push(lookupObject[i]);
+            }
+                
+            return newArray;
+        },
+        getTotals: function(name) {
+            var playerTotal = 0;
+            var players = [];
+
+            for (var i = 0; i < this.scores.length; i++) {
+                var result = this.scores[i];
+                var playerName = result.playerName;
+                players.push({player: playerName, result: result.result});
+            }
+
+            for (var i = 0; i < players.length; i++) {
+                if (players[i].player === name) {
+                    var score = players[i].result;
+                    playerTotal += score;
+                }
+            }
+
+            return playerTotal;
+        },
+        getWinCount: function(name) {
+            var wins = 0;
+            var players = [];
+
+            for (var i = 0; i < this.scores.length; i++) {
+                var result = this.scores[i];
+                var playerName = result.playerName;
+                players.push({player: playerName, result: result.result});
+            }
+
+            for (var i = 0; i < players.length; i++) {
+                if (players[i].player === name && players[i].result === 1) {
+                    wins += 1;
+                }
+            }
+
+            return wins;
+        },
+        getLoseCount: function(name) {
+            var losses = 0;
+            var players = [];
+
+            for (var i = 0; i < this.scores.length; i++) {
+                var result = this.scores[i];
+                var playerName = result.playerName;
+                players.push({player: playerName, result: result.result});
+            }
+
+            for (var i = 0; i < players.length; i++) {
+                if (players[i].player === name && players[i].result === 0) {
+                    losses += 1;
+                }
+            }
+
+            return losses;
+        },
+        getTieCount: function(name) {
+            var ties = 0;
+            var players = [];
+
+            for (var i = 0; i < this.scores.length; i++) {
+                var result = this.scores[i];
+                var playerName = result.playerName;
+                players.push({player: playerName, result: result.result});
+            }
+
+            for (var i = 0; i < players.length; i++) {
+                if (players[i].player === name && players[i].result === 0.5) {
+                    ties += 1;
+                }
+            }
+
+            return ties;
         },
         getParameterByName: function(name, url) {
             if (!url) url = window.location.href;
@@ -177,5 +328,6 @@ var app = new Vue({
     created: function () {
         this.gamePlayerId = this.getParameterByName("gp");
         this.fetchData();
+        this.fetchGames();
     },
 });
