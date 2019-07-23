@@ -34,7 +34,7 @@ public class SalvoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SalvoApplication.class, args);
 	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder(){
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -47,12 +47,10 @@ public class SalvoApplication {
 		return (args) -> {
 
 			Player jBauer = new Player("j.bauer@ctu.gov", passwordEncoder.encode("24"));
-			Player cObrian = new Player("c.obrian@ctu.gov", "42");
-			Player kBauer = new Player("kim_bauer@gmail.com", "kb");
-			Player tAlmeida = new Player("t.almeida@ctu.gov", "mole");
-			Player dPalmer = new Player("d.palmer@whitehouse.gov", "eagle");
-
-
+			Player cObrian = new Player("c.obrian@ctu.gov", passwordEncoder.encode("42"));
+			Player kBauer = new Player("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
+			Player tAlmeida = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
+			Player dPalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder.encode("eagle"));
 
 			PlayerRepository.save(jBauer);
 			PlayerRepository.save(cObrian);
@@ -241,11 +239,8 @@ public class SalvoApplication {
 		public void init(AuthenticationManagerBuilder auth) throws Exception {
 			auth.userDetailsService(inputName -> {
 				Player player = playerRepository.findByUsername(inputName);
-				System.out.println(player);
 				if (player != null) {
-					System.out.println("user found!");
-					System.out.println(player.getUserName() + player.getPassword());
-					return new User(player.getUserName(), player.getPassword(),
+                    return new User(player.getUserName(), player.getPassword(),
 							AuthorityUtils.createAuthorityList("USER"));
 				} else {
 					throw new UsernameNotFoundException("Unknown user: " + inputName);
@@ -279,7 +274,7 @@ public class SalvoApplication {
 					.antMatchers("/web/main.js").permitAll()
 
 					.antMatchers("/api/players").permitAll()
-					.antMatchers("/api/game*").permitAll()
+					.antMatchers("/api/game*").hasAuthority("USER")
 					.antMatchers("/api/login*").permitAll()
 					.antMatchers("/api/games/players*").permitAll()
 					.antMatchers("/api/game_view/*").permitAll()

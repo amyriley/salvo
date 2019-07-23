@@ -1,12 +1,18 @@
 package com.codeoftheweb.salvo;
 
 import com.codeoftheweb.salvo.dto.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import static java.util.stream.Collectors.toList;
 
 @RestController
@@ -24,6 +30,11 @@ public class SalvoController {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
+    }
+
+    @RequestMapping(value = "/username")
+    public CurrentPlayerDto getCurrentPlayer(Authentication authentication) {
+        return makeCurrentPlayerDto(playerRepository.findByUsername(authentication.getName()));
     }
 
     @RequestMapping("/game_view/{gamePlayerId}")
@@ -57,6 +68,10 @@ public class SalvoController {
     }
 
     @RequestMapping("/games")
+    public GamesDto getGames() {
+        return makeGamesDto();
+    }
+
     public List<GameDto> getAllGames() {
         return gameRepository
                 .findAll()
@@ -76,6 +91,17 @@ public class SalvoController {
         dto.setId(gamePlayer.getId());
         dto.setPlayer(makePlayerDto(gamePlayer.getPlayer()));
         dto.setSalvoes(salvoDtos);
+
+        return dto;
+    }
+
+    private GamesDto makeGamesDto() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        GamesDto dto = new GamesDto();
+        dto.setCurrentPlayer(makeCurrentPlayerDto(playerRepository.findByUsername(auth.getName())));
+        dto.setGames(getAllGames());
 
         return dto;
     }
@@ -135,6 +161,15 @@ public class SalvoController {
         dto.setPlayerName(score.getPlayer().getUserName());
         dto.setResult(score.getResult());
         dto.setFinishDate(score.getFinishDate());
+
+        return dto;
+    }
+
+    private CurrentPlayerDto makeCurrentPlayerDto(Player player) {
+
+        CurrentPlayerDto dto = new CurrentPlayerDto();
+        dto.setName(player.getUserName());
+        dto.setId(player.getId());
 
         return dto;
     }
