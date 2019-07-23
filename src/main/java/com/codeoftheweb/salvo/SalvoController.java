@@ -1,17 +1,12 @@
 package com.codeoftheweb.salvo;
 
 import com.codeoftheweb.salvo.dto.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -68,11 +63,26 @@ public class SalvoController {
     }
 
     @RequestMapping("/games")
-    public GamesDto getGames() {
+    private GamesDto getGames() {
         return makeGamesDto();
     }
 
-    public List<GameDto> getAllGames() {
+    @RequestMapping(path = "/players", method = RequestMethod.POST)
+    public ResponseEntity<String> createPlayer(@RequestParam String username, String password) {
+        if (username.isEmpty()) {
+            return new ResponseEntity<>("No username given", HttpStatus.FORBIDDEN);
+        }
+
+        Player player = playerRepository.findByUsername(username);
+        if (player != null) {
+            return new ResponseEntity<>("Username already used", HttpStatus.CONFLICT);
+        }
+
+        playerRepository.save(new Player(username, password));
+        return new ResponseEntity<>("Named added", HttpStatus.CREATED);
+    }
+
+    private List<GameDto> getAllGames() {
         return gameRepository
                 .findAll()
                 .stream()

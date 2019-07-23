@@ -274,7 +274,7 @@ public class SalvoApplication {
 					.antMatchers("/web/main.js").permitAll()
 
 					.antMatchers("/api/players").permitAll()
-					.antMatchers("/api/game*").hasAuthority("USER")
+					.antMatchers("/api/game*").permitAll()
 					.antMatchers("/api/login*").permitAll()
 					.antMatchers("/api/games/players*").permitAll()
 					.antMatchers("/api/game_view/*").permitAll()
