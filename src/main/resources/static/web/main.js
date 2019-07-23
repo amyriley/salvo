@@ -49,9 +49,7 @@ var app = new Vue({
                 fetch(url, request)
                     .then(response => response.json())
                     .then(games => {
-                        console.log(games);
                         this.getPlayers(games);
-                        this.getWinCount("j.bauer@ctu.gov")
                     })
                     .catch(error => {
                         console.log(error);
@@ -84,7 +82,6 @@ var app = new Vue({
            
             var uniquePlayers = this.removeDuplicates(players, "player");
             uniquePlayers.sort((a, b) => (a.total < b.total) ? 1 : -1)
-
 
             this.players = players;
             this.results = results;

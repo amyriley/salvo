@@ -1,6 +1,8 @@
 package com.codeoftheweb.salvo;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import javax.persistence.*;
 import java.util.*;
 import static java.util.stream.Collectors.toList;
@@ -8,11 +10,14 @@ import static java.util.stream.Collectors.toList;
 @Entity
 public class Player {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
-    private String userName;
+
+    private String username;
     private String password;
 
     @OneToMany(mappedBy="player", fetch=FetchType.EAGER)
@@ -23,8 +28,8 @@ public class Player {
 
     public Player() {}
 
-    public Player(String userName, String password) {
-        this.userName = userName;
+    public Player(String username, String password) {
+        this.username = username;
         this.password = password;
     }
 
@@ -37,15 +42,15 @@ public class Player {
     }
 
     public String getUserName() {
-        return userName;
+        return username;
     }
 
     public void setUserName(String username) {
-        this.userName = username;
+        this.username = username;
     }
 
     public String toString() {
-        return userName;
+        return username;
     }
 
     public List<Game> getGames() {

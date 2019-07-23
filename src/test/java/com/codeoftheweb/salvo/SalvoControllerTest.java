@@ -148,7 +148,7 @@ public class SalvoControllerTest {
     }
 
     private Player buildDefaultPlayer() {
-        return new Player("playerTest1@gmail.com");
+        return new Player("playerTest1@gmail.com", "");
     }
 
     private Salvo buildDefaultSalvo() {
