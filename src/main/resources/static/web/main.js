@@ -9,6 +9,9 @@ var app = new Vue({
         results: [],
         scores: [],
         players: [],
+        email: "",
+        password: "",
+        authenticated: false
     },
     methods: {
         fetchData: function() {
@@ -37,24 +40,87 @@ var app = new Vue({
             }
         },
         fetchGames: function() {
-            if (document.title === "Salvo!") {
-                var games;
-                var url = "/api/games";
-    
-                var request = {
-                    method: 'GET',
-                    body: JSON.stringify(games),
-                };
-    
-                fetch(url, request)
-                    .then(response => response.json())
-                    .then(games => {
-                        this.getPlayers(games);
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    })
-            }
+            var games;
+            var url = "/api/games";
+
+            var request = {
+                method: 'GET',
+                body: JSON.stringify(games),
+            };
+
+            fetch(url, request)
+                .then(response => response.json())
+                .then(games => {
+                    this.getPlayers(games.games);
+                })
+                .catch(error => {
+                    console.log(error);
+                })
+        },
+        postLogin: function() {
+            fetch("/api/login", {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-type': 'application/x-www-form-urlencoded'
+                },
+                body: `username=${ this.email }&password=${ this.password }`
+              })
+              .then(response => {
+                console.log(response)
+                if (response.status == 200) {
+                  console.log("logged in!")
+                  this.authenticated = true;
+                //   window.location.reload();
+                  this.fetchGames();
+                } else {
+                  alert("Invalid email or password")
+                }
+              })
+              .catch(error => console.log(error))
+        },
+        postLogout: function() {
+            fetch("/api/logout", {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-type': 'application/x-www-form-urlencoded'
+                },
+                body: `username=${ this.email }&password=${ this.password }`
+              })
+              .then(response => {
+                console.log(response)
+                if (response.status == 200) {
+                  console.log("logged out!")
+                  this.authenticated = false;
+                //   window.location.reload();
+                } else {
+                  alert("Invalid email or password")
+                }
+              })
+              .catch(error => console.log(error))
+        },
+        postSignup: function() {
+            fetch("/api/players", {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-type': 'application/x-www-form-urlencoded'
+                },
+                body: `username=${ this.email }&password=${ this.password }`
+              })
+              .then(response => {
+                console.log(response)
+                if (response.status == 201) {
+                  console.log("signed up!")
+                } else {
+                  alert("Sign up unsuccessful")
+                }
+              })
+              .catch(error => console.log(error))
         },
         getScores: function(games) {
             var scores = [];
@@ -325,6 +391,5 @@ var app = new Vue({
     created: function () {
         this.gamePlayerId = this.getParameterByName("gp");
         this.fetchData();
-        this.fetchGames();
     },
 });

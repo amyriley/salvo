@@ -7,7 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
 import static java.util.stream.Collectors.toList;
 
 @RestController
@@ -62,13 +61,13 @@ public class SalvoController {
         return dto;
     }
 
-    @RequestMapping("/games")
+    @RequestMapping(value="/games", method = RequestMethod.GET)
     private GamesDto getGames() {
         return makeGamesDto();
     }
 
-    @RequestMapping(path = "/players", method = RequestMethod.POST)
-    public ResponseEntity<String> createPlayer(@RequestParam String username, String password) {
+    @RequestMapping(value = "/players", method = RequestMethod.POST)
+    public ResponseEntity<String> createPlayer(@RequestParam("username") String username, @RequestParam("password") String password) {
         if (username.isEmpty()) {
             return new ResponseEntity<>("No username given", HttpStatus.FORBIDDEN);
         }

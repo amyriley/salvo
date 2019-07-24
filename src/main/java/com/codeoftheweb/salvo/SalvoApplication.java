@@ -13,12 +13,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.web.context.WebApplicationContext;
@@ -279,7 +276,7 @@ public class SalvoApplication {
 					.antMatchers("/api/games/players*").permitAll()
 					.antMatchers("/api/game_view/*").permitAll()
 					.antMatchers("/api/login").permitAll()
-					.antMatchers("/**").hasAuthority("USER")
+//					.antMatchers("/**").hasAuthority("USER")
 					.anyRequest().authenticated()
 					.and()
 					.formLogin()
