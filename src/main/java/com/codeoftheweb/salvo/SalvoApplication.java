@@ -261,31 +261,29 @@ public class SalvoApplication {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http
-					.csrf().disable()
-					.authorizeRequests()
-					.antMatchers("/rest/players*").permitAll()
-
-					.antMatchers("/").permitAll()
-					.antMatchers("/web/index*").permitAll()
-					.antMatchers("/web/game*").permitAll()
-					.antMatchers("/web/main.js").permitAll()
-
-					.antMatchers("/api/players").permitAll()
-					.antMatchers("/api/game*").permitAll()
-					.antMatchers("/api/login*").permitAll()
-					.antMatchers("/api/games/players*").permitAll()
-					.antMatchers("/api/game_view/*").permitAll()
-					.antMatchers("/api/login").permitAll()
-//					.antMatchers("/**").hasAuthority("USER")
-					.anyRequest().authenticated()
-					.and()
-					.formLogin()
-					.usernameParameter("username")
-					.passwordParameter("password")
-					.loginPage("/api/login")
-					.and()
-					.logout()
-					.logoutUrl("/api/logout");
+                    .csrf().disable()
+                    .authorizeRequests()
+                    .antMatchers("/rest/players*").permitAll()
+                    .antMatchers("/").permitAll()
+                    .antMatchers("/web/home*").permitAll()
+                    .antMatchers("/web/main.js").permitAll()
+                    .antMatchers("/web/players*").permitAll()
+                    .antMatchers("/api/players").permitAll()
+                    .antMatchers("/api/game*").permitAll()
+                    .antMatchers("/api/login*").permitAll()
+                    .antMatchers("/web/game*").permitAll()
+                    .antMatchers("/api/games/players*").permitAll()
+                    .antMatchers("/web/game-view*").permitAll()
+                    .antMatchers("/**").hasAuthority("USER")
+                    .anyRequest().authenticated()
+                    .and()
+                    .formLogin()
+                    .usernameParameter("username")
+                    .passwordParameter("password")
+                    .loginPage("/api/login")
+                    .and()
+                    .logout()
+                    .logoutUrl("/api/logout");
 
 			// if user is not authenticated, just send an authentication failure response
 			http.exceptionHandling().authenticationEntryPoint((req, res, exc) -> {

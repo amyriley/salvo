@@ -9,7 +9,7 @@ var app = new Vue({
         results: [],
         scores: [],
         players: [],
-        email: "",
+        username: "",
         password: "",
         authenticated: false
     },
@@ -65,9 +65,11 @@ var app = new Vue({
                   'Accept': 'application/json',
                   'Content-type': 'application/x-www-form-urlencoded'
                 },
-                body: `username=${ this.email }&password=${ this.password }`
+                body: `username=${ this.username }&password=${ this.password }`
               })
               .then(response => {
+                console.log(this.username)
+                console.log(this.password)
                 console.log(response)
                 if (response.status == 200) {
                   console.log("logged in!")
@@ -88,7 +90,7 @@ var app = new Vue({
                   'Accept': 'application/json',
                   'Content-type': 'application/x-www-form-urlencoded'
                 },
-                body: `username=${ this.email }&password=${ this.password }`
+                body: `username=${ this.username }&password=${ this.password }`
               })
               .then(response => {
                 console.log(response)
@@ -110,12 +112,13 @@ var app = new Vue({
                   'Accept': 'application/json',
                   'Content-type': 'application/x-www-form-urlencoded'
                 },
-                body: `username=${ this.email }&password=${ this.password }`
+                body: `username=${ this.username }&password=${ this.password }`
               })
               .then(response => {
                 console.log(response)
                 if (response.status == 201) {
                   console.log("signed up!")
+                  this.postLogin();
                 } else {
                   alert("Sign up unsuccessful")
                 }
@@ -125,9 +128,11 @@ var app = new Vue({
         getScores: function(games) {
             var scores = [];
 
-            for (var i = 0; i < games.length; i++) {
-                var score = games[i].scores;
-                score.forEach((score) => scores.push(score));
+            if (games != null) {
+                for (var i = 0; i < games.length; i++) {
+                    var score = games[i].scores;
+                    score.forEach((score) => scores.push(score));
+                }
             }
 
             this.scores = scores;

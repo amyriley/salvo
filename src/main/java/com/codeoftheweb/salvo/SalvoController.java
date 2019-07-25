@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
 import static java.util.stream.Collectors.toList;
 
 @RestController
@@ -16,14 +18,17 @@ public class SalvoController {
     private GameRepository gameRepository;
     private GamePlayerRepository gamePlayerRepository;
     private PlayerRepository playerRepository;
+    private PasswordEncoder passwordEncoder;
 
     public SalvoController(
             GameRepository gameRepository,
             GamePlayerRepository gamePlayerRepository,
-            PlayerRepository playerRepository) {
+            PlayerRepository playerRepository,
+            PasswordEncoder passwordEncoder) {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @RequestMapping(value = "/username")
@@ -61,23 +66,27 @@ public class SalvoController {
         return dto;
     }
 
-    @RequestMapping(value="/games", method = RequestMethod.GET)
+    @RequestMapping(value = "/games", method = RequestMethod.GET)
     private GamesDto getGames() {
         return makeGamesDto();
     }
 
     @RequestMapping(value = "/players", method = RequestMethod.POST)
-    public ResponseEntity<String> createPlayer(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public ResponseEntity<String> createPlayer(@RequestParam String username, @RequestParam String password) {
         if (username.isEmpty()) {
             return new ResponseEntity<>("No username given", HttpStatus.FORBIDDEN);
         }
 
         Player player = playerRepository.findByUsername(username);
+
         if (player != null) {
             return new ResponseEntity<>("Username already used", HttpStatus.CONFLICT);
         }
 
-        playerRepository.save(new Player(username, password));
+        playerRepository.save(new Player(username, passwordEncoder.encode(password)));
+        System.out.println("new user: " + username);
+        System.out.println("found: " + playerRepository.findByUsername(username));
+
         return new ResponseEntity<>("Named added", HttpStatus.CREATED);
     }
 
