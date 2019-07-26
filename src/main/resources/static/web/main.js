@@ -11,7 +11,11 @@ var app = new Vue({
         players: [],
         username: "",
         password: "",
-        authenticated: false
+        authenticated: false,
+        games: [],
+        gamesList: [],
+        loggedInPlayersGames: [],
+        gamePlayerIds: []
     },
     methods: {
         fetchData: function() {
@@ -51,11 +55,91 @@ var app = new Vue({
             fetch(url, request)
                 .then(response => response.json())
                 .then(games => {
+                    this.games = games.games;
                     this.getPlayers(games.games);
+                    this.getGamesList(games.games);
+                    this.getLoggedInPlayersGames(games.games);
                 })
                 .catch(error => {
                     console.log(error);
                 })
+        },
+        getGamesList: function() {
+            var games = this.games;
+            var gamesList = this.gamesList;
+
+            for (var i = 0; i < games.length; i++) {
+                var game = games[i];
+                gamesList.push({id: game.id, created: game.created.toLocaleString(), players: this.getGamePlayers(game), gamePlayerIds: this.getGamePlayerIds(game)});
+            }
+
+            return gamesList;
+        },
+        gamePlayerIdsContains: function(n) {
+            return this.gamePlayerIds.indexOf(n) > -1
+        },
+        getGamePlayers: function(game) {
+            var gamePlayers = [];
+            var players = [];
+            var gamePlayerIds = [];
+            var emails = [];
+
+            for (var i = 0; i < game.gamePlayers.length; i++) {
+                var gamePlayer = game.gamePlayers[i];
+                gamePlayers.push(gamePlayer);
+            }
+
+            for (var i = 0; i < gamePlayers.length; i++) {
+                var player = gamePlayers[i].player;
+                players.push(player);
+                gamePlayerIds.push(gamePlayers[i].id);
+            }
+
+            for (var i = 0; i < players.length; i++) {
+                var email = players[i].email;
+                emails.push(email);
+            }
+            
+            return emails;
+        },
+        getGamePlayerIds: function(game) {
+            var gamePlayerIds = [];
+            var gamePlayers = [];
+            var players = [];
+            var gamePlayerIds = [];
+
+            for (var i = 0; i < game.gamePlayers.length; i++) {
+                var gamePlayer = game.gamePlayers[i];
+                gamePlayers.push(gamePlayer);
+            }
+
+            for (var i = 0; i < gamePlayers.length; i++) {
+                var player = gamePlayers[i].player;
+                players.push(player);
+                gamePlayerIds.push(gamePlayers[i].id);
+            }
+
+            this.gamePlayerIds = gamePlayerIds;
+            return gamePlayerIds;
+        },
+        getLoggedInPlayersGames: function(games) {
+            var loggedInPlayersGames = [];
+            var gamePlayers = [];
+
+            for (var i = 0; i < games.length; i++) {
+                var gamePlayer = games[i].gamePlayers;
+                gamePlayer.forEach((gamePlayer) => gamePlayers.push({gamePlayer: gamePlayer, gameId: games[i].id}));
+            }
+
+            for (var i = 0; i < gamePlayers.length; i++) {
+                if (gamePlayers[i].gamePlayer.player.email == this.username) {
+                    loggedInPlayersGames.push({player: gamePlayers[i].gamePlayer.player.email, gameId: gamePlayers[i].gameId, gamePlayerId: gamePlayers[i].gamePlayer.id})
+                    this.gamePlayerId = gamePlayers[i].gamePlayer.player.id;
+                }
+            }
+
+            this.loggedInPlayersGames = loggedInPlayersGames;
+            return loggedInPlayersGames;
         },
         postLogin: function() {
             fetch("/api/login", {
@@ -68,13 +152,10 @@ var app = new Vue({
                 body: `username=${ this.username }&password=${ this.password }`
               })
               .then(response => {
-                console.log(this.username)
-                console.log(this.password)
                 console.log(response)
                 if (response.status == 200) {
                   console.log("logged in!")
                   this.authenticated = true;
-                //   window.location.reload();
                   this.fetchGames();
                 } else {
                   alert("Invalid email or password")
@@ -97,10 +178,12 @@ var app = new Vue({
                 if (response.status == 200) {
                   console.log("logged out!")
                   this.authenticated = false;
-                //   window.location.reload();
                 } else {
                   alert("Invalid email or password")
                 }
+              })
+              .then(function() {
+                window.location.href = "http://localhost:8080/web/games.html";
               })
               .catch(error => console.log(error))
         },

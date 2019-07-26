@@ -36,6 +36,13 @@ public class SalvoController {
         return makeCurrentPlayerDto(playerRepository.findByUsername(authentication.getName()));
     }
 
+//    public ResponseEntity<String> checkCurrentPlayer(@RequestParam String username) {
+//        if (username.isEmpty()) {
+//            return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
+//        }
+//
+//    }
+
     @RequestMapping("/game_view/{gamePlayerId}")
     public GameDto getOneGame(@PathVariable Long gamePlayerId) {
 
@@ -84,8 +91,6 @@ public class SalvoController {
         }
 
         playerRepository.save(new Player(username, passwordEncoder.encode(password)));
-        System.out.println("new user: " + username);
-        System.out.println("found: " + playerRepository.findByUsername(username));
 
         return new ResponseEntity<>("Named added", HttpStatus.CREATED);
     }
