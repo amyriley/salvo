@@ -5,9 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -36,15 +38,19 @@ public class SalvoController {
         return makeCurrentPlayerDto(playerRepository.findByUsername(authentication.getName()));
     }
 
-//    public ResponseEntity<String> checkCurrentPlayer(@RequestParam String username) {
-//        if (username.isEmpty()) {
-//            return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
-//        }
-//
-//    }
-
     @RequestMapping("/game_view/{gamePlayerId}")
-    public GameDto getOneGame(@PathVariable Long gamePlayerId) {
+    public ResponseEntity<GameDto> checkPlayerId(Authentication authentication, @PathVariable Long gamePlayerId) {
+
+        Player player = playerRepository.findByUsername(authentication.getName());
+
+        if (player.getId() != gamePlayerId) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(getOneGame(gamePlayerId), HttpStatus.CREATED);
+    }
+
+    public GameDto getOneGame(Long gamePlayerId) {
 
         GameDto dto = new GameDto();
         GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
@@ -72,7 +78,7 @@ public class SalvoController {
 
         return dto;
     }
-
+    
     @RequestMapping(value = "/games", method = RequestMethod.GET)
     private GamesDto getGames() {
         return makeGamesDto();
