@@ -60,14 +60,17 @@
                         <tr v-for="(game, index) in gamesList" :key="index">
                             <td class="text-sm-center" style='width: 50px'>{{game.id}}</td>
                             <td class="text-sm-center" style='width: 50px'>{{game.created}}</td>
-                            <td class="text-sm-center" style='width: 50px'>
-                                <a v-if="game.players.indexOf(username) > -1" id='game-link' :href="`/web/game.html?gp=${gamePlayerId}`">{{game.players}}</a>
+                            <td v-for="gamePlayer in game.gamePlayerIds" class="text-sm-center" style='width: 50px'>
+                                <a :id="gamePlayer.id" v-if="gamePlayer.email == username" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
                                 <a v-else>{{game.players}}</a>
                             </td>
                         </tr>
                     </tbody>
                 </table>
+                <button v-on:click="postGame" type="submit" class="btn btn-primary">Create game</button>
+
         </div>
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

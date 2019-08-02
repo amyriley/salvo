@@ -15,10 +15,14 @@ var app = new Vue({
         games: [],
         gamesList: [],
         loggedInPlayersGames: [],
-        gamePlayerIds: []
+        gamePlayerIds: [],
+        gamePlayersList: [],
     },
     methods: {
         fetchData: function() {
+
+            this.gamePlayerId = this.getParameterByName("gp");
+
             if (document.title === "Ship Locations!") {
                 var data;
                 var url = "/api/game_view/" + this.gamePlayerId;
@@ -55,14 +59,38 @@ var app = new Vue({
             fetch(url, request)
                 .then(response => response.json())
                 .then(games => {
+                    console.log(games.games)
+                    console.log(games)
+                    this.getGamePlayers
                     this.games = games.games;
                     this.getPlayers(games.games);
                     this.getGamesList(games.games);
-                    this.getLoggedInPlayersGames(games.games);
+                    // this.getLoggedInPlayersGames(games.games);
                 })
                 .catch(error => {
                     console.log(error);
                 })
+        },
+        postGame: function() {
+            fetch("/api/games", {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-type': 'application/x-www-form-urlencoded'
+                },
+                body: `username=${ this.username }`
+              })
+              .then(response => {
+                console.log(response)
+                if (response.status == 201) {
+                  console.log("game created")
+                //   window.location.href = "http://localhost:8080/web/game.html?gp=" + document.getElementById("gamePlayer.id");
+                } else {
+                  alert("Game not created");
+                }
+              })
+              .catch(error => console.log(error))
         },
         getGamesList: function() {
             var games = this.games;
@@ -99,7 +127,7 @@ var app = new Vue({
                 var email = players[i].email;
                 emails.push(email);
             }
-            
+
             return emails;
         },
         getGamePlayerIds: function(game) {
@@ -116,31 +144,31 @@ var app = new Vue({
             for (var i = 0; i < gamePlayers.length; i++) {
                 var player = gamePlayers[i].player;
                 players.push(player);
-                gamePlayerIds.push(gamePlayers[i].id);
+                gamePlayerIds.push({id: gamePlayers[i].id, email: gamePlayers[i].player.email});
             }
 
             this.gamePlayerIds = gamePlayerIds;
             return gamePlayerIds;
         },
-        getLoggedInPlayersGames: function(games) {
-            var loggedInPlayersGames = [];
-            var gamePlayers = [];
+        // getLoggedInPlayersGames: function(games) {
+        //     var loggedInPlayersGames = [];
+        //     var gamePlayers = [];
 
-            for (var i = 0; i < games.length; i++) {
-                var gamePlayer = games[i].gamePlayers;
-                gamePlayer.forEach((gamePlayer) => gamePlayers.push({gamePlayer: gamePlayer, gameId: games[i].id}));
-            }
+        //     for (var i = 0; i < games.length; i++) {
+        //         var gamePlayer = games[i].gamePlayers;
+        //         gamePlayer.forEach((gamePlayer) => gamePlayers.push({gamePlayer: gamePlayer, gameId: games[i].id}));
+        //     }
 
-            for (var i = 0; i < gamePlayers.length; i++) {
-                if (gamePlayers[i].gamePlayer.player.email == this.username) {
-                    loggedInPlayersGames.push({player: gamePlayers[i].gamePlayer.player.email, gameId: gamePlayers[i].gameId, gamePlayerId: gamePlayers[i].gamePlayer.id})
-                    this.gamePlayerId = gamePlayers[i].gamePlayer.player.id;
-                }
-            }
+        //     for (var i = 0; i < gamePlayers.length; i++) {
+        //         if (gamePlayers[i].gamePlayer.player.email == this.username) {
+        //             loggedInPlayersGames.push({player: gamePlayers[i].gamePlayer.player.email, gameId: gamePlayers[i].gameId, gamePlayerId: gamePlayers[i].gamePlayer.id})
+        //             this.gamePlayerId = gamePlayers[i].gamePlayer.player.id;
+        //         }
+        //     }
 
-            this.loggedInPlayersGames = loggedInPlayersGames;
-            return loggedInPlayersGames;
-        },
+        //     this.loggedInPlayersGames = loggedInPlayersGames;
+        //     return loggedInPlayersGames;
+        // },
         postLogin: function() {
             fetch("/api/login", {
                 method: 'POST',
@@ -477,7 +505,8 @@ var app = new Vue({
         },
     },
     created: function () {
-        this.gamePlayerId = this.getParameterByName("gp");
         this.fetchData();
+        // this.gpId = document.getElementById("gamePlayer.id");
+        // console.log("gpId " + this.gpId);
     },
 });

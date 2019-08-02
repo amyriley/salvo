@@ -5,9 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,11 +40,11 @@ public class SalvoController {
     }
 
     @RequestMapping("/game_view/{gamePlayerId}")
-    public ResponseEntity<GameDto> checkPlayerId(Authentication authentication, @PathVariable Long gamePlayerId) {
+    public ResponseEntity<GameDto> checkPlayer(@PathVariable Long gamePlayerId, Authentication authentication) {
 
-        Player player = playerRepository.findByUsername(authentication.getName());
+        GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
 
-        if (player.getId() != gamePlayerId) {
+        if (playerRepository.findByUsername(authentication.getName()) != gamePlayer.getPlayer() ) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -78,10 +79,29 @@ public class SalvoController {
 
         return dto;
     }
-    
+
     @RequestMapping(value = "/games", method = RequestMethod.GET)
     private GamesDto getGames() {
         return makeGamesDto();
+    }
+
+    @RequestMapping(value = "/games", method = RequestMethod.POST)
+    public ResponseEntity<GameDto> createGame(@RequestParam String username) {
+
+        Player currentUser = playerRepository.findByUsername(username);
+
+        if (currentUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Game game = new Game();
+        GamePlayer gamePlayer1 = new GamePlayer(currentUser, game);
+
+        gameRepository.save(game);
+
+        gamePlayerRepository.save(gamePlayer1);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/players", method = RequestMethod.POST)
