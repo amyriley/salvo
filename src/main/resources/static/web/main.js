@@ -17,6 +17,7 @@ var app = new Vue({
         loggedInPlayersGames: [],
         gamePlayerIds: [],
         gamePlayersList: [],
+        id: null
     },
     methods: {
         fetchData: function() {
@@ -85,10 +86,36 @@ var app = new Vue({
                 console.log(response)
                 if (response.status == 201) {
                   console.log("game created")
-                //   window.location.href = "http://localhost:8080/web/game.html?gp=" + document.getElementById("gamePlayer.id");
+                return response.json();
                 } else {
                   alert("Game not created");
                 }
+              }).then(function(data) {
+                  window.location.href = "http://localhost:8080/web/game.html?gp=" + data.id;
+              })
+              .catch(error => console.log(error))
+        },
+        joinGame: function(gameId) {
+
+            fetch("/api/game/" + gameId + "/players", {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-type': 'application/x-www-form-urlencoded'
+                },
+                body: `username=${ this.username }`
+              })
+              .then(response => {
+                console.log(response)
+                if (response.status == 201) {
+                  console.log("you can join!")
+                return response.json();
+                } else {
+                  alert("Error");
+                }
+              }).then(function(data) {
+                  window.location.href = "http://localhost:8080/web/game.html?gp=" + data.id;
               })
               .catch(error => console.log(error))
         },
@@ -98,9 +125,12 @@ var app = new Vue({
 
             for (var i = 0; i < games.length; i++) {
                 var game = games[i];
-                gamesList.push({id: game.id, created: game.created.toLocaleString(), players: this.getGamePlayers(game), gamePlayerIds: this.getGamePlayerIds(game)});
+                gamesList.push({id: game.id, created: game.created.toLocaleString(), 
+                    players: this.getGamePlayers(game), 
+                    gamePlayerIds: this.getGamePlayerIds(game)});
             }
 
+            console.log("gamesList " + this.gamesList);
             return gamesList;
         },
         gamePlayerIdsContains: function(n) {
@@ -144,7 +174,8 @@ var app = new Vue({
             for (var i = 0; i < gamePlayers.length; i++) {
                 var player = gamePlayers[i].player;
                 players.push(player);
-                gamePlayerIds.push({id: gamePlayers[i].id, email: gamePlayers[i].player.email});
+                gamePlayerIds.push({id: gamePlayers[i].id, 
+                    email: gamePlayers[i].player.email});
             }
 
             this.gamePlayerIds = gamePlayerIds;

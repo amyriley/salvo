@@ -60,14 +60,23 @@
                         <tr v-for="(game, index) in gamesList" :key="index">
                             <td class="text-sm-center" style='width: 50px'>{{game.id}}</td>
                             <td class="text-sm-center" style='width: 50px'>{{game.created}}</td>
-                            <td v-for="gamePlayer in game.gamePlayerIds" class="text-sm-center" style='width: 50px'>
-                                <a :id="gamePlayer.id" v-if="gamePlayer.email == username" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
+                            <td class="text-sm-center" style='width: 50px'>{{game.gamePlayerIds}}</td>
+                            <td v-if="game.players.indexOf(username) > -1" class="text-sm-center" style='width: 50px'>
                                 <a v-else>{{game.players}}</a>
+                                <a v-for="gamePlayer in game.gamePlayerIds" :id="gamePlayer.id" :href="`/web/game.html?gp=${gamePlayer.id}`">{{gamePlayer.email}}</a>
                             </td>
+                            <td>
+                                <button :id="game.id" :value="game.id" v-on:click="joinGame(game.id)" type="submit" class="btn btn-primary">Join game</button>
+                            </td>
+                            
+                            <!-- <td  class="text-sm-center" style='width: 50px'>
+                                <a v-if="gamePlayer.email == username" :id="gamePlayer.id" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
+                                <a v-else>{{game.players}}</a>
+                            </td> -->
                         </tr>
                     </tbody>
                 </table>
-                <button v-on:click="postGame" type="submit" class="btn btn-primary">Create game</button>
+                <button v-on:click="postGame()" type="submit" class="btn btn-primary">Create game</button>
 
         </div>
 

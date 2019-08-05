@@ -51,7 +51,7 @@ public class SalvoController {
         return new ResponseEntity<>(getOneGame(gamePlayerId), HttpStatus.CREATED);
     }
 
-    public GameDto getOneGame(Long gamePlayerId) {
+    private GameDto getOneGame(Long gamePlayerId) {
 
         GameDto dto = new GameDto();
         GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
@@ -86,7 +86,7 @@ public class SalvoController {
     }
 
     @RequestMapping(value = "/games", method = RequestMethod.POST)
-    public ResponseEntity<GameDto> createGame(@RequestParam String username) {
+    public ResponseEntity<GamePlayerDto> createGame(@RequestParam String username) {
 
         Player currentUser = playerRepository.findByUsername(username);
 
@@ -98,10 +98,49 @@ public class SalvoController {
         GamePlayer gamePlayer1 = new GamePlayer(currentUser, game);
 
         gameRepository.save(game);
-
         gamePlayerRepository.save(gamePlayer1);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Map<String, Object> gamePlayerIds = new HashMap<>();
+
+        gamePlayerIds.put("gpid", gamePlayer1.getId());
+        System.out.println("gpid" + gamePlayerIds);
+
+        GamePlayerDto dto = makeGamePlayerDto(gamePlayer1);
+
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/game/{gameId}/players", method = RequestMethod.POST)
+    public ResponseEntity<GamePlayerDto> joinGame(@PathVariable Long gameId, Authentication authentication) {
+
+        System.out.println("gameId " + gameId);
+
+        Player currentUser = playerRepository.findByUsername(authentication.getName());
+
+        if (currentUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (gameRepository.findById(gameId) == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Game game = gameRepository.getOne(gameId);
+
+        if (game.getGamePlayers().size() > 1) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        if (currentUser.getGames().contains(game)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        GamePlayer gamePlayer = new GamePlayer(currentUser, game);
+        gamePlayerRepository.save(gamePlayer);
+        gameRepository.save(game);
+        GamePlayerDto dto = makeGamePlayerDto(gamePlayer);
+
+        return new ResponseEntity<GamePlayerDto>(dto, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/players", method = RequestMethod.POST)
