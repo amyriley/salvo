@@ -61,12 +61,12 @@ var app = new Vue({
                 .then(response => response.json())
                 .then(games => {
                     console.log(games.games)
-                    console.log(games)
+                    console.log("games " + games)
                     this.getGamePlayers
                     this.games = games.games;
                     this.getPlayers(games.games);
                     this.getGamesList(games.games);
-                    // this.getLoggedInPlayersGames(games.games);
+                    this.shipLocations(7)
                 })
                 .catch(error => {
                     console.log(error);
@@ -96,7 +96,6 @@ var app = new Vue({
               .catch(error => console.log(error))
         },
         joinGame: function(gameId) {
-
             fetch("/api/game/" + gameId + "/players", {
                 method: 'POST',
                 credentials: 'include',
@@ -112,10 +111,33 @@ var app = new Vue({
                   console.log("you can join!")
                 return response.json();
                 } else {
-                  alert("Error");
+                  alert("You cannot join this game");
                 }
               }).then(function(data) {
                   window.location.href = "http://localhost:8080/web/game.html?gp=" + data.id;
+              })
+              .catch(error => console.log(error))
+        },
+        shipLocations: function(gamePlayerId) {
+            fetch("/api/games/players/" + 7 + "/ships", {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Accept': 'application/json;charset=UTF-8',
+                  'Content-type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify([ { "type": "test1", "locations": ["A1", "B1", "C1"] },
+                { "type": "test2", "locations": ["H5", "H6"] }
+                ])
+              })
+              .then(response => {
+                console.log(response)
+                if (response.status == 201) {
+                  console.log("success!")
+                return response.json();
+                } else {
+                  alert("Error");
+                }
               })
               .catch(error => console.log(error))
         },
@@ -127,7 +149,7 @@ var app = new Vue({
                 var game = games[i];
                 gamesList.push({id: game.id, created: game.created.toLocaleString(), 
                     players: this.getGamePlayers(game), 
-                    gamePlayerIds: this.getGamePlayerIds(game)});
+                    gamePlayerIds: this.getGamePlayerEmails(game)});
             }
 
             console.log("gamesList " + this.gamesList);
@@ -160,7 +182,7 @@ var app = new Vue({
 
             return emails;
         },
-        getGamePlayerIds: function(game) {
+        getGamePlayerEmails: function(game) {
             var gamePlayerIds = [];
             var gamePlayers = [];
             var players = [];
@@ -174,8 +196,7 @@ var app = new Vue({
             for (var i = 0; i < gamePlayers.length; i++) {
                 var player = gamePlayers[i].player;
                 players.push(player);
-                gamePlayerIds.push({id: gamePlayers[i].id, 
-                    email: gamePlayers[i].player.email});
+                gamePlayerIds.push({email: gamePlayers[i].player.email, id: gamePlayers[i].id});
             }
 
             this.gamePlayerIds = gamePlayerIds;

@@ -8,11 +8,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
+import static org.springframework.data.repository.init.ResourceReader.Type.JSON;
 
 @RestController
 @RequestMapping("/api")
@@ -22,16 +21,19 @@ public class SalvoController {
     private GamePlayerRepository gamePlayerRepository;
     private PlayerRepository playerRepository;
     private PasswordEncoder passwordEncoder;
+    private ShipRepository shipRepository;
 
     public SalvoController(
             GameRepository gameRepository,
             GamePlayerRepository gamePlayerRepository,
             PlayerRepository playerRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            ShipRepository shipRepository) {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.shipRepository = shipRepository;
     }
 
     @RequestMapping(value = "/username")
@@ -158,6 +160,45 @@ public class SalvoController {
         playerRepository.save(new Player(username, passwordEncoder.encode(password)));
 
         return new ResponseEntity<>("Named added", HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public ResponseEntity<String> shipLocations(@PathVariable Long gamePlayerId, @RequestBody Set<Ship> ships, Authentication authentication) {
+
+        Player currentUser = playerRepository.findByUsername(authentication.getName());
+
+        GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
+        System.out.println(gamePlayerId);
+
+        if (currentUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (gamePlayer == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (currentUser.getGamePlayers().contains(gamePlayer) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (gamePlayer.getShips().size() > 0) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Set<Ship> shipsSet = new HashSet<>();
+
+        for (Ship ship: ships) {
+            System.out.println(ship.getType());
+            System.out.println(ship.getLocations());
+            shipRepository.save(ship);
+            gamePlayer.addShip(ship);
+
+        }
+
+        gamePlayerRepository.save(gamePlayer);
+
+        return new ResponseEntity<>("Ships added", HttpStatus.CREATED);
     }
 
     private List<GameDto> getAllGames() {

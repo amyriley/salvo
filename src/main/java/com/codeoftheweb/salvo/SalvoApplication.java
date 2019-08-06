@@ -113,8 +113,6 @@ public class SalvoApplication {
 			g3.addShip(ship5);
 			g3.addShip(ship3);
 
-			g7.addShip(ship1);
-
 			g1.addShip(ship4);
 			g1.addShip(ship3);
 			g1.addShip(ship5);

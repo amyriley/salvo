@@ -60,11 +60,18 @@
                         <tr v-for="(game, index) in gamesList" :key="index">
                             <td class="text-sm-center" style='width: 50px'>{{game.id}}</td>
                             <td class="text-sm-center" style='width: 50px'>{{game.created}}</td>
-                            <td class="text-sm-center" style='width: 50px'>{{game.gamePlayerIds}}</td>
-                            <td v-if="game.players.indexOf(username) > -1" class="text-sm-center" style='width: 50px'>
+                            <td v-for="gamePlayer in game.gamePlayerIds" class="text-sm-center" style='width: 50px'>
+                                <a v-if="gamePlayer.email.indexOf(username) > -1 && game.players.length >= 1" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
+                                <a v-else>{{game.players}}</a>
+                            </td>
+                            <!-- <td v-for="gamePlayer in game.gamePlayers" class="text-sm-center" style='width: 50px'>
+                                <a>{{gamePlayer.player}}</a>
+                            </td> -->
+
+                            <!-- <td v-if="game.players.indexOf(username) > -1" class="text-sm-center" style='width: 50px'>
                                 <a v-else>{{game.players}}</a>
                                 <a v-for="gamePlayer in game.gamePlayerIds" :id="gamePlayer.id" :href="`/web/game.html?gp=${gamePlayer.id}`">{{gamePlayer.email}}</a>
-                            </td>
+                            </td> -->
                             <td>
                                 <button :id="game.id" :value="game.id" v-on:click="joinGame(game.id)" type="submit" class="btn btn-primary">Join game</button>
                             </td>
