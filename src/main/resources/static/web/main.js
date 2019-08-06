@@ -17,7 +17,17 @@ var app = new Vue({
         loggedInPlayersGames: [],
         gamePlayerIds: [],
         gamePlayersList: [],
-        id: null
+        id: null,
+        ships: [{number: 1, type: "Aircraft carrier", length: 5}, 
+        {number: 1, type: "Battleship", length: 4}, 
+        {number: 1, type: "Submarine", length: 3}, 
+        {number: 1, type: "Destroyer", length: 3}, 
+        {number: 1, type: "Patrol boat", length: 2}],
+        shipLength: "",
+        firstLocation: null,
+        location: null,
+        endLocation: null,
+        possibleShipPositions: []
     },
     methods: {
         fetchData: function() {
@@ -119,7 +129,7 @@ var app = new Vue({
               .catch(error => console.log(error))
         },
         shipLocations: function(gamePlayerId) {
-            fetch("/api/games/players/" + 7 + "/ships", {
+            fetch("/api/games/players/" + gamePlayerId + "/ships", {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -140,6 +150,92 @@ var app = new Vue({
                 }
               })
               .catch(error => console.log(error))
+        },
+        selectShip: function() {
+            var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
+            this.shipLength = shipLength;
+
+            return shipLength;
+        },
+        showPossibleShipLocations: function(location) {
+            var table = document.getElementById("gameTable");
+            var targetTDs = table.querySelectorAll('td');
+            var positions = this.calculateShipEndLocation(location);
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+
+                if (tdId == location) {
+                    targetTDs[i].style.backgroundColor = "green";
+                }
+
+                for (var j = 0; j < positions.length; j++) {
+                    if (tdId === positions[j]) {
+                        console.log("match " + positions[j]);
+                        targetTDs[i].style.backgroundColor = "gray";
+                    }
+                }
+            }
+        },
+        selectShipLocation: function(id) {
+            this.location = id;
+            this.showPossibleShipLocations(id);
+
+            return id;
+        },
+        selectEndShipLocation: function(id) {
+            this.endLocation = id;
+
+            return id;
+        },
+        calculateShipEndLocation: function(id) {
+            var possiblePosition = this.shipLength - 1;
+            var positions = [];
+
+            if (id.length > 2) {
+                var numberCoordinate = "10";
+            } else {
+                var numberCoordinate = id[1];
+            }
+
+            var letterCoordinate = id[0];
+
+            var horizontal1 = parseInt(numberCoordinate) + parseInt(possiblePosition);
+            var horizontal2 = parseInt(numberCoordinate) - parseInt(possiblePosition);
+
+            console.log("horizontal1: " + horizontal1);
+            console.log("horizontal2: " + horizontal2);
+ 
+            if (horizontal1 <= 10 && horizontal1 >= 1) {
+                positions.push(letterCoordinate + horizontal1);
+            }
+
+            if (horizontal2 <= 10 && horizontal2 >= 1) {
+                positions.push(letterCoordinate + horizontal2);
+            }
+
+            var nextLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) + parseInt(possiblePosition));
+            var previousLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) - parseInt(possiblePosition));
+
+            console.log("next letter: " + String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) + parseInt(possiblePosition)));
+            console.log("previous letter: " + String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) - parseInt(possiblePosition)));
+
+            if (nextLetter.charCodeAt(0) <= 74 && nextLetter.charCodeAt(0) >= 65) {
+                positions.push(nextLetter + numberCoordinate);
+            }
+
+            if (previousLetter.charCodeAt(0) <= 74 && previousLetter.charCodeAt(0) >= 65) {
+                positions.push(previousLetter + numberCoordinate);
+            }
+
+            console.log("positions: " + positions);
+
+            this.possibleShipPositions = positions;
+
+            return positions;
+        },
+        selectShipEndLocation: function() {
+
         },
         getGamesList: function() {
             var games = this.games;
@@ -202,25 +298,6 @@ var app = new Vue({
             this.gamePlayerIds = gamePlayerIds;
             return gamePlayerIds;
         },
-        // getLoggedInPlayersGames: function(games) {
-        //     var loggedInPlayersGames = [];
-        //     var gamePlayers = [];
-
-        //     for (var i = 0; i < games.length; i++) {
-        //         var gamePlayer = games[i].gamePlayers;
-        //         gamePlayer.forEach((gamePlayer) => gamePlayers.push({gamePlayer: gamePlayer, gameId: games[i].id}));
-        //     }
-
-        //     for (var i = 0; i < gamePlayers.length; i++) {
-        //         if (gamePlayers[i].gamePlayer.player.email == this.username) {
-        //             loggedInPlayersGames.push({player: gamePlayers[i].gamePlayer.player.email, gameId: gamePlayers[i].gameId, gamePlayerId: gamePlayers[i].gamePlayer.id})
-        //             this.gamePlayerId = gamePlayers[i].gamePlayer.player.id;
-        //         }
-        //     }
-
-        //     this.loggedInPlayersGames = loggedInPlayersGames;
-        //     return loggedInPlayersGames;
-        // },
         postLogin: function() {
             fetch("/api/login", {
                 method: 'POST',
@@ -558,7 +635,5 @@ var app = new Vue({
     },
     created: function () {
         this.fetchData();
-        // this.gpId = document.getElementById("gamePlayer.id");
-        // console.log("gpId " + this.gpId);
     },
 });
