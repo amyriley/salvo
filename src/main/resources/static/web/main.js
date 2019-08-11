@@ -23,11 +23,13 @@ var app = new Vue({
         {number: 1, type: "Submarine", length: 3}, 
         {number: 1, type: "Destroyer", length: 3}, 
         {number: 1, type: "Patrol boat", length: 2}],
-        shipLength: "",
+        shipLength: null,
         firstLocation: null,
         location: null,
         endLocation: null,
-        possibleShipPositions: []
+        testLocation: null,
+        possibleShipPositions: [],
+        stage: 1,
     },
     methods: {
         fetchData: function() {
@@ -155,12 +157,14 @@ var app = new Vue({
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
             this.shipLength = shipLength;
 
+            console.log("shipLength " + this.shipLength)
             return shipLength;
         },
         showPossibleShipLocations: function(location) {
             var table = document.getElementById("gameTable");
             var targetTDs = table.querySelectorAll('td');
             var positions = this.calculateShipEndLocation(location);
+            var newPositions = [];
 
             for (var i = 0; i < targetTDs.length; i++) {
                 var tdId = targetTDs[i].id;
@@ -171,71 +175,144 @@ var app = new Vue({
 
                 for (var j = 0; j < positions.length; j++) {
                     if (tdId === positions[j]) {
-                        console.log("match " + positions[j]);
                         targetTDs[i].style.backgroundColor = "gray";
+                        this.stage = 2;
+                        if (this.stage == 2) {
+                            targetTDs[i].onclick = function() {
+                                this.endLocation = this.id;
+                                document.getElementById(this.endLocation).style.backgroundColor = "red";
+                                newPositions.push(this.endLocation, location)
+                                console.log(newPositions);
+    
+                                var finalPositions = [];
+                                var missingLetters = [];
+    
+                                var firstLetter = location[0];
+                                var endLetter = this.endLocation[0];
+    
+                                if (location.length > 2) {
+                                    var firstNumber = "10";
+                                } else {
+                                    var firstNumber = location[1];
+                                }
+    
+                                if (this.endLocation.length > 2) {
+                                    var endNumber = "10";
+                                } else {
+                                    var endNumber = this.endLocation[1];
+                                }
+    
+                                if (firstLetter == endLetter) {
+                                    var missingLetters = firstLetter;
+                                } else {
+    
+                                    if (firstLetter.charCodeAt(firstLetter) < endLetter.charCodeAt(endLetter)) {
+                                        for (var i = firstLetter.charCodeAt(firstLetter); i <= endLetter.charCodeAt(endLetter); i++) {
+                                            if (i <= 74 && i >= 65) {
+                                                missingLetters.push(String.fromCharCode(i))
+                                            }
+                                        }
+                                    } else {      
+                                        for (var i = endLetter.charCodeAt(endLetter); i <= firstLetter.charCodeAt(firstLetter); i++) {
+                                            if (i <= 74 && i >= 65) {
+                                                missingLetters.push(String.fromCharCode(i))
+                                            }
+                                        }
+                                    }
+                                }
+    
+                                var list = [];
+    
+                                    if (parseInt(firstNumber) < parseInt(endNumber)) {
+                                        for (var i = parseInt(firstNumber); i <= parseInt(endNumber); i++) {
+                                            list.push(i);
+                                        }
+                                    } else {
+                                        for (var i = parseInt(endNumber); i <= parseInt(firstNumber); i++) {
+                                            list.push(i);
+                                        }
+                                    }
+    
+                                for (var i = 0; i < list.length; i++) {
+                                    for (var j = 0; j < missingLetters.length; j++) {
+                                        var newCoordinate = missingLetters[j] + list[i];
+                                        finalPositions.push(newCoordinate);
+                                    }
+                                }
+    
+                                for (var i = 0; i < finalPositions.length; i++) {
+                                    document.getElementById(finalPositions[i]).style.background = "red";
+                                }
+    
+                                console.log("finalPositions " + finalPositions);
+
+                                for (var i = 0; positions.length; i++) {
+                                    if (positions[i] != this.endLocation) {
+                                        document.getElementById(positions[i]).style.backgroundColor = "white";
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
+
+            return newPositions;
+        },
+        handleEvent: function(passedInElement) {
+            return function() {
+                this.endLocation = passedInElement;
+            };
         },
         selectShipLocation: function(id) {
-            this.location = id;
-            this.showPossibleShipLocations(id);
-
-            return id;
-        },
-        selectEndShipLocation: function(id) {
-            this.endLocation = id;
+            if (this.stage == 1) {
+                this.location = id;
+                this.showPossibleShipLocations(id);
+            }
 
             return id;
         },
         calculateShipEndLocation: function(id) {
-            var possiblePosition = this.shipLength - 1;
-            var positions = [];
+                var possiblePosition = this.shipLength - 1;
+                var positions = [];
+    
+                if (id.length > 2) {
+                    var numberCoordinate = "10";
+                } else {
+                    var numberCoordinate = id[1];
+                }
+    
+                var letterCoordinate = id[0];
+    
+                var horizontal1 = parseInt(numberCoordinate) + parseInt(possiblePosition);
+                var horizontal2 = parseInt(numberCoordinate) - parseInt(possiblePosition);
+     
+                if (horizontal1 <= 10 && horizontal1 >= 1) {
+                    positions.push(letterCoordinate + horizontal1);
+                }
+    
+                if (horizontal2 <= 10 && horizontal2 >= 1) {
+                    positions.push(letterCoordinate + horizontal2);
+                }
+    
+                var nextLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) + parseInt(possiblePosition));
+                var previousLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) - parseInt(possiblePosition));
+    
+                if (nextLetter.charCodeAt(0) <= 74 && nextLetter.charCodeAt(0) >= 65) {
+                    positions.push(nextLetter + numberCoordinate);
+                }
+    
+                if (previousLetter.charCodeAt(0) <= 74 && previousLetter.charCodeAt(0) >= 65) {
+                    positions.push(previousLetter + numberCoordinate);
+                }
+    
+                console.log("positions: " + positions);
+    
+                this.possibleShipPositions = positions;
 
-            if (id.length > 2) {
-                var numberCoordinate = "10";
-            } else {
-                var numberCoordinate = id[1];
-            }
-
-            var letterCoordinate = id[0];
-
-            var horizontal1 = parseInt(numberCoordinate) + parseInt(possiblePosition);
-            var horizontal2 = parseInt(numberCoordinate) - parseInt(possiblePosition);
-
-            console.log("horizontal1: " + horizontal1);
-            console.log("horizontal2: " + horizontal2);
- 
-            if (horizontal1 <= 10 && horizontal1 >= 1) {
-                positions.push(letterCoordinate + horizontal1);
-            }
-
-            if (horizontal2 <= 10 && horizontal2 >= 1) {
-                positions.push(letterCoordinate + horizontal2);
-            }
-
-            var nextLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) + parseInt(possiblePosition));
-            var previousLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) - parseInt(possiblePosition));
-
-            console.log("next letter: " + String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) + parseInt(possiblePosition)));
-            console.log("previous letter: " + String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) - parseInt(possiblePosition)));
-
-            if (nextLetter.charCodeAt(0) <= 74 && nextLetter.charCodeAt(0) >= 65) {
-                positions.push(nextLetter + numberCoordinate);
-            }
-
-            if (previousLetter.charCodeAt(0) <= 74 && previousLetter.charCodeAt(0) >= 65) {
-                positions.push(previousLetter + numberCoordinate);
-            }
-
-            console.log("positions: " + positions);
-
-            this.possibleShipPositions = positions;
-
-            return positions;
-        },
-        selectShipEndLocation: function() {
-
+                this.stage = 1;
+    
+                return positions;
         },
         getGamesList: function() {
             var games = this.games;

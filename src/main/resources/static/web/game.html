@@ -22,7 +22,7 @@
                         </thead>
                         <tbody v-for="letter in rows" id="table-rows-game">
                                 <th>{{letter}}</th>
-                                <td v-on:click="selectShipLocation(letter + number)" class="text-sm-center" style='width: 50px' v-for="number in headers" :id="letter + number"></td>
+                                <td v-on:click="selectShipLocation(letter + number)" style='width: 50px' v-for="number in headers" :id="letter + number"></td>
                         </tbody>
                     </table>  
                 </div>
