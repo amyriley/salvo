@@ -18,12 +18,13 @@ var app = new Vue({
         gamePlayerIds: [],
         gamePlayersList: [],
         id: null,
-        ships: [{number: 1, type: "Aircraft carrier", length: 5}, 
-        {number: 1, type: "Battleship", length: 4}, 
-        {number: 1, type: "Submarine", length: 3}, 
-        {number: 1, type: "Destroyer", length: 3}, 
-        {number: 1, type: "Patrol boat", length: 2}],
+        ships: [{number: 1, type: "Aircraft carrier", length: 5, positions: [], placing: false}, 
+        {number: 1, type: "Battleship", length: 4, positions: [], placing: false}, 
+        {number: 1, type: "Submarine", length: 3, positions: [], placing: false}, 
+        {number: 1, type: "Destroyer", length: 3, positions: [], placing: false}, 
+        {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false}],
         shipLength: null,
+        shipType: null,
         firstLocation: null,
         location: null,
         endLocation: null,
@@ -155,16 +156,22 @@ var app = new Vue({
         },
         selectShip: function() {
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
+            var shipType = document.querySelector('input[name="ship_selector"]:checked').id;
+            var ships = this.ships;
             this.shipLength = shipLength;
+            this.shipType = shipType;
 
-            console.log("shipLength " + this.shipLength)
+            for (var i = 0; i < ships.length; i++) {
+                if (shipType === ships[i].type) {
+                    ships[i].placing = true;
+                }
+            }
+
             return shipLength;
         },
-        showPossibleShipLocations: function(location) {
+        showStartLocation: function(location) {
             var table = document.getElementById("gameTable");
             var targetTDs = table.querySelectorAll('td');
-            var positions = this.calculateShipEndLocation(location);
-            var newPositions = [];
 
             for (var i = 0; i < targetTDs.length; i++) {
                 var tdId = targetTDs[i].id;
@@ -172,103 +179,175 @@ var app = new Vue({
                 if (tdId == location) {
                     targetTDs[i].style.backgroundColor = "green";
                 }
+            }
 
-                for (var j = 0; j < positions.length; j++) {
-                    if (tdId === positions[j]) {
+            for (var i = 0; i < this.ships.length; i++) {
+                if (this.ships[i].placing == true) {
+                    this.showPossibleShipLocations(location);
+                }
+            }
+
+            console.log("location " + this.location);
+
+            return location;
+        },
+        showPossibleShipLocations: function(location) {
+            var possiblePositions = this.calculateShipEndLocation(location);
+
+            var table = document.getElementById("gameTable");
+            var targetTDs = table.querySelectorAll('td');
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+
+                for (var j = 0; j < possiblePositions.length; j++) {
+                    if (tdId == possiblePositions[j]) {
                         targetTDs[i].style.backgroundColor = "gray";
-                        this.stage = 2;
-                        if (this.stage == 2) {
-                            targetTDs[i].onclick = function() {
-                                this.endLocation = this.id;
-                                document.getElementById(this.endLocation).style.backgroundColor = "red";
-                                newPositions.push(this.endLocation, location)
-                                console.log(newPositions);
-    
-                                var finalPositions = [];
-                                var missingLetters = [];
-    
-                                var firstLetter = location[0];
-                                var endLetter = this.endLocation[0];
-    
-                                if (location.length > 2) {
-                                    var firstNumber = "10";
-                                } else {
-                                    var firstNumber = location[1];
-                                }
-    
-                                if (this.endLocation.length > 2) {
-                                    var endNumber = "10";
-                                } else {
-                                    var endNumber = this.endLocation[1];
-                                }
-    
-                                if (firstLetter == endLetter) {
-                                    var missingLetters = firstLetter;
-                                } else {
-    
-                                    if (firstLetter.charCodeAt(firstLetter) < endLetter.charCodeAt(endLetter)) {
-                                        for (var i = firstLetter.charCodeAt(firstLetter); i <= endLetter.charCodeAt(endLetter); i++) {
-                                            if (i <= 74 && i >= 65) {
-                                                missingLetters.push(String.fromCharCode(i))
-                                            }
-                                        }
-                                    } else {      
-                                        for (var i = endLetter.charCodeAt(endLetter); i <= firstLetter.charCodeAt(firstLetter); i++) {
-                                            if (i <= 74 && i >= 65) {
-                                                missingLetters.push(String.fromCharCode(i))
-                                            }
-                                        }
-                                    }
-                                }
-    
-                                var list = [];
-    
-                                    if (parseInt(firstNumber) < parseInt(endNumber)) {
-                                        for (var i = parseInt(firstNumber); i <= parseInt(endNumber); i++) {
-                                            list.push(i);
-                                        }
-                                    } else {
-                                        for (var i = parseInt(endNumber); i <= parseInt(firstNumber); i++) {
-                                            list.push(i);
-                                        }
-                                    }
-    
-                                for (var i = 0; i < list.length; i++) {
-                                    for (var j = 0; j < missingLetters.length; j++) {
-                                        var newCoordinate = missingLetters[j] + list[i];
-                                        finalPositions.push(newCoordinate);
-                                    }
-                                }
-    
-                                for (var i = 0; i < finalPositions.length; i++) {
-                                    document.getElementById(finalPositions[i]).style.background = "red";
-                                }
-    
-                                console.log("finalPositions " + finalPositions);
+                    }
+                }
+            }
 
-                                for (var i = 0; positions.length; i++) {
-                                    if (positions[i] != this.endLocation) {
-                                        document.getElementById(positions[i]).style.backgroundColor = "white";
-                                    }
-                                }
+            this.selectEndLocation(possiblePositions, location);
+
+            return possiblePositions;
+        },
+        selectEndLocation: function(possiblePositions, location) {
+            var end;
+            var table = document.getElementById("gameTable");
+            var targetTDs = table.querySelectorAll('td');
+
+            for (let i = 0; i < targetTDs.length; i++) {
+
+                for (let j = 0; j < possiblePositions.length; j++) {
+                    if (targetTDs[i].id == possiblePositions[j]) {
+                        var id = targetTDs[i].id;
+                        var self = this;
+
+                        targetTDs[i].onclick = (function(id){
+                            return function(){
+                                var id1 = id;
+                                document.getElementById(id).style.background = "red";
+                                self.calculateFinalPosition(location, id1);
+                                // self.clearGrid();
                             }
+                        })(id);
+                    }
+                }
+            }
+
+            for (var i = 0; i < this.ships.length; i++) {
+                if (this.shipType === this.ships[i].type) {
+                    this.ships[i].placing = false;
+                    console.log("false");
+                }
+            }
+
+            return end;
+        },
+        clearGrid: function() {
+            var table = document.getElementById("gameTable");
+            var targetTDs = table.querySelectorAll('td');
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+                document.getElementById(tdId).style.background = "white";
+            }
+
+            console.log("grid cleared");
+        },
+        calculateFinalPosition(startLocation, endLocation) {
+            console.log("calculateFinalPosition");
+            var finalPositions = [];
+            var missingLetters = [];
+            var firstLetter = startLocation[0];
+            var endLetter = endLocation[0];
+            var list = [];
+
+            if (startLocation.length > 2) {
+                var firstNumber = "10";
+            } else {
+                var firstNumber = startLocation[1];
+            }
+
+            if (endLocation.length > 2) {
+                var endNumber = "10";
+            } else {
+                var endNumber = endLocation[1];
+            }
+
+            if (firstLetter == endLetter) {
+                var missingLetters = firstLetter;
+            } else {
+                if (firstLetter.charCodeAt(firstLetter) < endLetter.charCodeAt(endLetter)) {
+                    for (var i = firstLetter.charCodeAt(firstLetter); i <= endLetter.charCodeAt(endLetter); i++) {
+                        if (i <= 74 && i >= 65) {
+                            missingLetters.push(String.fromCharCode(i))
+                        }
+                    }
+                } else {      
+                    for (var i = endLetter.charCodeAt(endLetter); i <= firstLetter.charCodeAt(firstLetter); i++) {
+                        if (i <= 74 && i >= 65) {
+                            missingLetters.push(String.fromCharCode(i))
                         }
                     }
                 }
             }
 
-            return newPositions;
+            if (parseInt(firstNumber) < parseInt(endNumber)) {
+                for (var i = parseInt(firstNumber); i <= parseInt(endNumber); i++) {
+                    list.push(i);
+                }
+            } else {
+                for (var i = parseInt(endNumber); i <= parseInt(firstNumber); i++) {
+                    list.push(i);
+                }
+            }
+
+            for (var i = 0; i < list.length; i++) {
+                for (var j = 0; j < missingLetters.length; j++) {
+                    var newCoordinate = missingLetters[j] + list[i];
+                    finalPositions.push(newCoordinate);
+                }
+            }
+
+            console.log("finalPositions " + finalPositions);
+
+            this.setFinalShipPositions(finalPositions);
         },
-        handleEvent: function(passedInElement) {
-            return function() {
-                this.endLocation = passedInElement;
-            };
+        setFinalShipPositions: function(finalPositions) {
+            for (var i = 0; i < this.ships.length; i++) {
+                if (this.shipType === this.ships[i].type) {
+                    this.ships[i].positions.push(finalPositions);
+                }
+            }
+
+            this.showFinalShipPositions(finalPositions);
+        },
+        showFinalShipPositions: function(finalPositions) {
+            this.clearGrid();
+            console.log("showFinalShipPositions")
+            var table = document.getElementById("gameTable");
+            var targetTDs = table.querySelectorAll('td');
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+
+                for (var j = 0; j < finalPositions.length; j++) {
+                    if (tdId == finalPositions[j]) {
+                        document.getElementById(tdId).style.background = "red";
+                    }
+                }
+            }
         },
         selectShipLocation: function(id) {
-            if (this.stage == 1) {
+            this.stage = 2;
+
+            if (this.stage == 2) {
                 this.location = id;
-                this.showPossibleShipLocations(id);
+                this.showStartLocation(id);
             }
+
+            this.stage = 1;
 
             return id;
         },
@@ -309,8 +388,6 @@ var app = new Vue({
                 console.log("positions: " + positions);
     
                 this.possibleShipPositions = positions;
-
-                this.stage = 1;
     
                 return positions;
         },
