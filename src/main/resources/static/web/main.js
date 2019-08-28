@@ -187,8 +187,6 @@ var app = new Vue({
                 }
             }
 
-            console.log("location " + this.location);
-
             return location;
         },
         showPossibleShipLocations: function(location) {
@@ -211,6 +209,17 @@ var app = new Vue({
 
             return possiblePositions;
         },
+        clearPlacerMarkers: function() {
+        var table = document.getElementById("gameTable");
+        var targetTDs = table.querySelectorAll('td');
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var isPlacerMarker = targetTDs[i].style.backgroundColor == "gray";
+                if (isPlacerMarker) {
+                     targetTDs[i].style.backgroundColor = "white";
+                 }
+            }
+        },
         selectEndLocation: function(possiblePositions, location) {
             var end;
             var table = document.getElementById("gameTable");
@@ -228,17 +237,15 @@ var app = new Vue({
                                 var id1 = id;
                                 document.getElementById(id).style.background = "red";
                                 self.calculateFinalPosition(location, id1);
-                                // self.clearGrid();
+                                for (var i = 0; i < self.ships.length; i++) {
+                                    if (self.shipType === self.ships[i].type) {
+                                        self.ships[i].placing = false;
+                                    }
+                                }
+                                self.clearPlacerMarkers();
                             }
                         })(id);
                     }
-                }
-            }
-
-            for (var i = 0; i < this.ships.length; i++) {
-                if (this.shipType === this.ships[i].type) {
-                    this.ships[i].placing = false;
-                    console.log("false");
                 }
             }
 
@@ -255,8 +262,7 @@ var app = new Vue({
 
             console.log("grid cleared");
         },
-        calculateFinalPosition(startLocation, endLocation) {
-            console.log("calculateFinalPosition");
+        calculateFinalPosition(startLocation, endLocation) {            
             var finalPositions = [];
             var missingLetters = [];
             var firstLetter = startLocation[0];
@@ -324,8 +330,6 @@ var app = new Vue({
             this.showFinalShipPositions(finalPositions);
         },
         showFinalShipPositions: function(finalPositions) {
-            this.clearGrid();
-            console.log("showFinalShipPositions")
             var table = document.getElementById("gameTable");
             var targetTDs = table.querySelectorAll('td');
 
@@ -336,6 +340,36 @@ var app = new Vue({
                     if (tdId == finalPositions[j]) {
                         document.getElementById(tdId).style.background = "red";
                     }
+                }
+            }
+
+            this.getAllPlacedShipPositions();
+        },
+        getAllPlacedShipPositions: function() {
+            var allPlacedShipPositions = [];
+
+            for (var i = 0; i < this.ships.length; i++) {
+                if (this.ships[i].positions.length > 0) {
+                    allPlacedShipPositions.push(this.ships[i].positions);
+                }     
+            }
+
+            console.log("allPlacedShipPositions " + allPlacedShipPositions);
+            this.showAllShips(allPlacedShipPositions);
+
+            return allPlacedShipPositions;
+        },
+        showAllShips: function(allShips) {
+            var table = document.getElementById("gameTable");
+            var targetTDs = table.querySelectorAll("td");
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+
+                for (var j = 0; j < allShips.length; j++) {
+                        if (tdId == allShips[j]) {
+                            document.getElementById(tdId).style.background = "red";
+                        }
                 }
             }
         },
@@ -352,44 +386,44 @@ var app = new Vue({
             return id;
         },
         calculateShipEndLocation: function(id) {
-                var possiblePosition = this.shipLength - 1;
-                var positions = [];
-    
-                if (id.length > 2) {
-                    var numberCoordinate = "10";
-                } else {
-                    var numberCoordinate = id[1];
-                }
-    
-                var letterCoordinate = id[0];
-    
-                var horizontal1 = parseInt(numberCoordinate) + parseInt(possiblePosition);
-                var horizontal2 = parseInt(numberCoordinate) - parseInt(possiblePosition);
-     
-                if (horizontal1 <= 10 && horizontal1 >= 1) {
-                    positions.push(letterCoordinate + horizontal1);
-                }
-    
-                if (horizontal2 <= 10 && horizontal2 >= 1) {
-                    positions.push(letterCoordinate + horizontal2);
-                }
-    
-                var nextLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) + parseInt(possiblePosition));
-                var previousLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) - parseInt(possiblePosition));
-    
-                if (nextLetter.charCodeAt(0) <= 74 && nextLetter.charCodeAt(0) >= 65) {
-                    positions.push(nextLetter + numberCoordinate);
-                }
-    
-                if (previousLetter.charCodeAt(0) <= 74 && previousLetter.charCodeAt(0) >= 65) {
-                    positions.push(previousLetter + numberCoordinate);
-                }
-    
-                console.log("positions: " + positions);
-    
-                this.possibleShipPositions = positions;
-    
-                return positions;
+            var possiblePosition = this.shipLength - 1;
+            var positions = [];
+
+            if (id.length > 2) {
+                var numberCoordinate = "10";
+            } else {
+                var numberCoordinate = id[1];
+            }
+
+            var letterCoordinate = id[0];
+
+            var horizontal1 = parseInt(numberCoordinate) + parseInt(possiblePosition);
+            var horizontal2 = parseInt(numberCoordinate) - parseInt(possiblePosition);
+
+            if (horizontal1 <= 10 && horizontal1 >= 1) {
+                positions.push(letterCoordinate + horizontal1);
+            }
+
+            if (horizontal2 <= 10 && horizontal2 >= 1) {
+                positions.push(letterCoordinate + horizontal2);
+            }
+
+            var nextLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) + parseInt(possiblePosition));
+            var previousLetter = String.fromCharCode(letterCoordinate.charCodeAt(letterCoordinate) - parseInt(possiblePosition));
+
+            if (nextLetter.charCodeAt(0) <= 74 && nextLetter.charCodeAt(0) >= 65) {
+                positions.push(nextLetter + numberCoordinate);
+            }
+
+            if (previousLetter.charCodeAt(0) <= 74 && previousLetter.charCodeAt(0) >= 65) {
+                positions.push(previousLetter + numberCoordinate);
+            }
+
+            console.log("positions: " + positions);
+
+            this.possibleShipPositions = positions;
+
+            return positions;
         },
         getGamesList: function() {
             var games = this.games;
