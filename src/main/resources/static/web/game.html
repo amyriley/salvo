@@ -38,12 +38,14 @@
                             </tr>
                         </thead>
                         <tbody v-for="ship in ships">
-                            <td>{{ship.number}}</td>
-                            <td>{{ship.type}}</td>
-                            <td>{{ship.length}}</td>
-                            <td>
-                                <input v-on:change="selectShip" type="radio" name="ship_selector" :id="ship.type" :value="ship.length">
-                            </td>
+                            <tr v-if="ship.placed == false">
+                                <td>{{ship.number}}</td>
+                                <td>{{ship.type}}</td>
+                                <td>{{ship.length}}</td>
+                                <td>
+                                    <input v-on:change="selectShip" type="radio" name="ship_selector" :id="ship.type" :value="ship.length">
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

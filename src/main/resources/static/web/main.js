@@ -18,11 +18,11 @@ var app = new Vue({
         gamePlayerIds: [],
         gamePlayersList: [],
         id: null,
-        ships: [{number: 1, type: "Aircraft carrier", length: 5, positions: [], placing: false}, 
-        {number: 1, type: "Battleship", length: 4, positions: [], placing: false}, 
-        {number: 1, type: "Submarine", length: 3, positions: [], placing: false}, 
-        {number: 1, type: "Destroyer", length: 3, positions: [], placing: false}, 
-        {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false}],
+        ships: [{number: 1, type: "Aircraft carrier", length: 5, positions: [], placing: false, placed: false}, 
+        {number: 1, type: "Battleship", length: 4, positions: [], placing: false, placed: false}, 
+        {number: 1, type: "Submarine", length: 3, positions: [], placing: false, placed: false}, 
+        {number: 1, type: "Destroyer", length: 3, positions: [], placing: false, placed: false}, 
+        {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false, placed: false}],
         shipLength: null,
         shipType: null,
         firstLocation: null,
@@ -31,6 +31,8 @@ var app = new Vue({
         testLocation: null,
         possibleShipPositions: [],
         stage: 1,
+        illegalPositions: [],
+        placing: false
     },
     methods: {
         fetchData: function() {
@@ -162,7 +164,7 @@ var app = new Vue({
             this.shipType = shipType;
 
             for (var i = 0; i < ships.length; i++) {
-                if (shipType === ships[i].type) {
+                if (shipType === ships[i].type && ships[i].placed == false) {
                     ships[i].placing = true;
                 }
             }
@@ -197,14 +199,13 @@ var app = new Vue({
 
             for (var i = 0; i < targetTDs.length; i++) {
                 var tdId = targetTDs[i].id;
-
                 for (var j = 0; j < possiblePositions.length; j++) {
-                    if (tdId == possiblePositions[j]) {
+                    if (tdId == possiblePositions[j] && targetTDs[i].style.backgroundColor != "red") {
                         targetTDs[i].style.backgroundColor = "gray";
                     }
                 }
             }
-
+            
             this.selectEndLocation(possiblePositions, location);
 
             return possiblePositions;
@@ -235,14 +236,21 @@ var app = new Vue({
                         targetTDs[i].onclick = (function(id){
                             return function(){
                                 var id1 = id;
-                                document.getElementById(id).style.background = "red";
-                                self.calculateFinalPosition(location, id1);
-                                for (var i = 0; i < self.ships.length; i++) {
-                                    if (self.shipType === self.ships[i].type) {
-                                        self.ships[i].placing = false;
+                                var finalPositions = self.calculateFinalPosition(location, id1);
+                                if (!self.canPlaceShip(finalPositions)) {
+                                    alert('You cannot place a ship here!');
+                                } else {
+                                    document.getElementById(id).style.background = "red";
+                                    self.setFinalShipPositions(finalPositions);
+                                    for (var i = 0; i < self.ships.length; i++) {
+                                        if (self.shipType === self.ships[i].type) {
+                                            self.ships[i].placing = false;
+                                            self.ships[i].placed = true;
+                                            self.placing = false;
+                                        }
                                     }
+                                    self.clearPlacerMarkers();
                                 }
-                                self.clearPlacerMarkers();
                             }
                         })(id);
                     }
@@ -251,18 +259,7 @@ var app = new Vue({
 
             return end;
         },
-        clearGrid: function() {
-            var table = document.getElementById("gameTable");
-            var targetTDs = table.querySelectorAll('td');
-
-            for (var i = 0; i < targetTDs.length; i++) {
-                var tdId = targetTDs[i].id;
-                document.getElementById(tdId).style.background = "white";
-            }
-
-            console.log("grid cleared");
-        },
-        calculateFinalPosition(startLocation, endLocation) {            
+        calculateFinalPosition(startLocation, endLocation) {
             var finalPositions = [];
             var missingLetters = [];
             var firstLetter = startLocation[0];
@@ -316,18 +313,45 @@ var app = new Vue({
                 }
             }
 
-            console.log("finalPositions " + finalPositions);
-
-            this.setFinalShipPositions(finalPositions);
+            return finalPositions;
         },
         setFinalShipPositions: function(finalPositions) {
+            var allPositions = this.getAllPlacedShipPositions();
+            console.log(allPositions);
+
+            for (var i = 0; i < allPositions.length; i++) {
+                var alreadyPlacedPosition = allPositions[i];
+
+                for (var j = 0; j < finalPositions.length; j++) {
+                    console.log(alreadyPlacedPosition + " " + finalPositions[j])
+                    if (alreadyPlacedPosition == finalPositions[j]) {
+                        return false;
+                    } 
+                }
+            }
+
             for (var i = 0; i < this.ships.length; i++) {
                 if (this.shipType === this.ships[i].type) {
-                    this.ships[i].positions.push(finalPositions);
+                    this.ships[i].positions = finalPositions;
                 }
             }
 
             this.showFinalShipPositions(finalPositions);
+        },
+        canPlaceShip: function(finalPositions) {
+            var allPositions = this.getAllPlacedShipPositions();
+
+            for (var i = 0; i < allPositions.length; i++) {
+                var alreadyPlacedPosition = allPositions[i];
+
+                for (var j = 0; j < finalPositions.length; j++) {
+                    if (alreadyPlacedPosition == finalPositions[j]) {
+                        return false;
+                    } 
+                }
+            }
+
+            return true;
         },
         showFinalShipPositions: function(finalPositions) {
             var table = document.getElementById("gameTable");
@@ -349,15 +373,26 @@ var app = new Vue({
             var allPlacedShipPositions = [];
 
             for (var i = 0; i < this.ships.length; i++) {
-                if (this.ships[i].positions.length > 0) {
-                    allPlacedShipPositions.push(this.ships[i].positions);
-                }     
+                if (this.ships[i].positions.length != 0) {
+                    for (var j = 0; j < this.ships[i].positions.length; j++) {
+                        allPlacedShipPositions.push(this.ships[i].positions[j]);
+                    }
+                } 
             }
 
-            console.log("allPlacedShipPositions " + allPlacedShipPositions);
             this.showAllShips(allPlacedShipPositions);
 
+            console.log(allPlacedShipPositions)
             return allPlacedShipPositions;
+        },
+        shipPositions: function() {
+            var shipPositions = [];
+
+            for (var i = 0; i < this.ships.length; i++) {
+                shipPositions.push(this.ships[i].positions);
+            }
+
+            return shipPositions;
         },
         showAllShips: function(allShips) {
             var table = document.getElementById("gameTable");
@@ -375,10 +410,11 @@ var app = new Vue({
         },
         selectShipLocation: function(id) {
             this.stage = 2;
+            this.location = id;
 
-            if (this.stage == 2) {
-                this.location = id;
+            if (!this.placing) {
                 this.showStartLocation(id);
+                this.placing = true;
             }
 
             this.stage = 1;
