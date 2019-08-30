@@ -243,7 +243,7 @@ var app = new Vue({
                                     document.getElementById(id).style.background = "red";
                                     self.setFinalShipPositions(finalPositions);
                                     for (var i = 0; i < self.ships.length; i++) {
-                                        if (self.shipType === self.ships[i].type) {
+                                        if (self.shipType == self.ships[i].type) {
                                             self.ships[i].placing = false;
                                             self.ships[i].placed = true;
                                             self.placing = false;
@@ -317,13 +317,11 @@ var app = new Vue({
         },
         setFinalShipPositions: function(finalPositions) {
             var allPositions = this.getAllPlacedShipPositions();
-            console.log(allPositions);
 
             for (var i = 0; i < allPositions.length; i++) {
                 var alreadyPlacedPosition = allPositions[i];
 
                 for (var j = 0; j < finalPositions.length; j++) {
-                    console.log(alreadyPlacedPosition + " " + finalPositions[j])
                     if (alreadyPlacedPosition == finalPositions[j]) {
                         return false;
                     } 
@@ -343,6 +341,10 @@ var app = new Vue({
 
             for (var i = 0; i < allPositions.length; i++) {
                 var alreadyPlacedPosition = allPositions[i];
+
+                if (alreadyPlacedPosition == finalPositions) {
+                    return false;
+                }
 
                 for (var j = 0; j < finalPositions.length; j++) {
                     if (alreadyPlacedPosition == finalPositions[j]) {
@@ -382,7 +384,6 @@ var app = new Vue({
 
             this.showAllShips(allPlacedShipPositions);
 
-            console.log(allPlacedShipPositions)
             return allPlacedShipPositions;
         },
         shipPositions: function() {
@@ -409,15 +410,17 @@ var app = new Vue({
             }
         },
         selectShipLocation: function(id) {
-            this.stage = 2;
-            this.location = id;
-
-            if (!this.placing) {
-                this.showStartLocation(id);
-                this.placing = true;
+            if (this.canPlaceShip(id)) {
+                // this.stage = 2;
+                this.location = id;
+    
+                if (!this.placing) {
+                    this.showStartLocation(id);
+                    this.placing = true;
+                }
+    
+                // this.stage = 1;
             }
-
-            this.stage = 1;
 
             return id;
         },
@@ -454,8 +457,6 @@ var app = new Vue({
             if (previousLetter.charCodeAt(0) <= 74 && previousLetter.charCodeAt(0) >= 65) {
                 positions.push(previousLetter + numberCoordinate);
             }
-
-            console.log("positions: " + positions);
 
             this.possibleShipPositions = positions;
 
