@@ -194,19 +194,21 @@ var app = new Vue({
         showPossibleShipLocations: function(location) {
             var possiblePositions = this.calculateShipEndLocation(location);
 
-            var table = document.getElementById("gameTable");
-            var targetTDs = table.querySelectorAll('td');
-
-            for (var i = 0; i < targetTDs.length; i++) {
-                var tdId = targetTDs[i].id;
-                for (var j = 0; j < possiblePositions.length; j++) {
-                    if (tdId == possiblePositions[j] && targetTDs[i].style.backgroundColor != "red") {
-                        targetTDs[i].style.backgroundColor = "gray";
+            if (possiblePositions.length > 0) {
+                var table = document.getElementById("gameTable");
+                var targetTDs = table.querySelectorAll('td');
+    
+                for (var i = 0; i < targetTDs.length; i++) {
+                    var tdId = targetTDs[i].id;
+                    for (var j = 0; j < possiblePositions.length; j++) {
+                        if (tdId == possiblePositions[j] && targetTDs[i].style.backgroundColor != "red") {
+                            targetTDs[i].style.backgroundColor = "gray";
+                        }
                     }
                 }
+                
+                this.selectEndLocation(possiblePositions, location);
             }
-            
-            this.selectEndLocation(possiblePositions, location);
 
             return possiblePositions;
         },
@@ -237,8 +239,9 @@ var app = new Vue({
                             return function(){
                                 var id1 = id;
                                 var finalPositions = self.calculateFinalPosition(location, id1);
+
                                 if (!self.canPlaceShip(finalPositions)) {
-                                    alert('You cannot place a ship here!');
+                                    alert("You cannot place a ship here!");
                                 } else {
                                     document.getElementById(id).style.background = "red";
                                     self.setFinalShipPositions(finalPositions);
@@ -335,6 +338,8 @@ var app = new Vue({
             }
 
             this.showFinalShipPositions(finalPositions);
+
+            console.log(this.ships);
         },
         canPlaceShip: function(finalPositions) {
             var allPositions = this.getAllPlacedShipPositions();
@@ -411,18 +416,35 @@ var app = new Vue({
         },
         selectShipLocation: function(id) {
             if (this.canPlaceShip(id)) {
-                // this.stage = 2;
                 this.location = id;
     
-                if (!this.placing) {
+                if (!this.placing && this.checkIfValidFinalLocation(id)) {
                     this.showStartLocation(id);
                     this.placing = true;
                 }
-    
-                // this.stage = 1;
             }
 
             return id;
+        },
+        checkIfValidFinalLocation: function(location) {
+            var endpoints = this.calculateShipEndLocation(location);
+            var validPositionChecks = [];
+            var self = this;
+
+            endpoints.forEach(function(endpoint) {
+                var finalPositions = self.calculateFinalPosition(location, endpoint);
+                var result = self.canPlaceShip(finalPositions);
+                validPositionChecks.push(result);
+            })
+
+            console.log("validPositionChecks " + validPositionChecks);
+
+            if (!validPositionChecks.includes(true)) {
+                alert("There are no valid positions available here!")
+                return false;
+            }
+
+            return true;
         },
         calculateShipEndLocation: function(id) {
             var possiblePosition = this.shipLength - 1;
