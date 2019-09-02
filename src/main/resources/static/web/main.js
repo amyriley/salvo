@@ -129,25 +129,32 @@ var app = new Vue({
               .catch(error => console.log(error))
         },
         shipLocations: function() {
-            fetch("/api/games/players/" + this.gamePlayerId + "/ships", {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json;charset=UTF-8',
-                    'Content-type': 'application/json;charset=UTF-8'
-                },
-                body: JSON.stringify(this.getShipLocations())
-                })
-                .then(response => {
-                console.log(response)
-                if (response.status == 201) {
-                    console.log("Success!")
-                return response.json();
-                } else {
-                    alert("Error");
-                }
-                })
-                .catch(error => console.log(error))
+
+            console.log("allShipsPlaced" + this.allShipsPlaced());
+
+            if (this.allShipsPlaced()) {
+                fetch("/api/games/players/" + this.gamePlayerId + "/ships", {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json;charset=UTF-8',
+                        'Content-type': 'application/json;charset=UTF-8'
+                    },
+                    body: JSON.stringify(this.getShipLocations())
+                    })
+                    .then(response => {
+                    console.log(response)
+                    if (response.status == 201) {
+                        console.log("Success!")
+                    return response.json();
+                    } else {
+                        alert("Error");
+                    }
+                    })
+                    .catch(error => console.log(error))
+            } else {
+                alert("You need to place all ships before confirming!")
+            }
         },
         selectShip: function() {
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
@@ -165,17 +172,13 @@ var app = new Vue({
             return shipLength;
         },
         allShipsPlaced: function() {
-            var placed = [];
+            var ships = this.ships;
 
-            for (var i = 0; i < this.ships.length; i++) {
-                placed.push(this.ships[i].placed);
+            for (var i = 0; i < ships.length; i++) {
+                if (ships[i].positions.length == 0) {
+                    return false;
+                }
             }
-
-            if (placed.includes(false)) {
-                return false;
-            }
-
-            console.log("placed " + placed)
 
             return true;
         },
