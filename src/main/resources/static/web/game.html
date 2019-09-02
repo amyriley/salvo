@@ -65,7 +65,7 @@
                             </thead>
                             <tbody v-for="letter in rows" id="table-rows-salvo">
                                     <th>{{letter}}</th>
-                                    <td class="text-sm-center" style='width: 50px' v-for="number in headers" :id="letter + number"></td>
+                                    <td v-on:click="selectSalvoLocation(letter + number)" style='width: 50px' v-for="number in headers" :id="letter + number"></td>
                             </tbody>
                     </table>
                 </div>

@@ -22,13 +22,15 @@ public class SalvoController {
     private PlayerRepository playerRepository;
     private PasswordEncoder passwordEncoder;
     private ShipRepository shipRepository;
+    private SalvoRepository salvoRepository;
 
     public SalvoController(
             GameRepository gameRepository,
             GamePlayerRepository gamePlayerRepository,
             PlayerRepository playerRepository,
             PasswordEncoder passwordEncoder,
-            ShipRepository shipRepository) {
+            ShipRepository shipRepository,
+            SalvoRepository salvoRepository) {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
@@ -168,7 +170,6 @@ public class SalvoController {
         Player currentUser = playerRepository.findByUsername(authentication.getName());
 
         GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
-        System.out.println(gamePlayerId);
 
         if (currentUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -186,8 +187,6 @@ public class SalvoController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        Set<Ship> shipsSet = new HashSet<>();
-
         for (Ship ship: ships) {
             System.out.println(ship.getType());
             System.out.println(ship.getLocations());
@@ -199,6 +198,42 @@ public class SalvoController {
         gamePlayerRepository.save(gamePlayer);
 
         return new ResponseEntity<>("Ships added", HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public ResponseEntity<String> salvoLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Salvo> salvoes) {
+
+        Player currentUser = playerRepository.findByUsername(authentication.getName());
+
+        GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
+
+        if (currentUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (gamePlayer == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (currentUser.getGamePlayers().contains(gamePlayer) == false) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (gamePlayer.getSalvoes().size() > 0) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        for (Salvo salvo: salvoes) {
+            System.out.println(salvo.getTurn());
+            System.out.println(salvo.getLocations());
+            salvoRepository.save(salvo);
+            gamePlayer.addSalvo(salvo);
+
+        }
+
+        gamePlayerRepository.save(gamePlayer);
+
+        return new ResponseEntity<>("Salvoes added", HttpStatus.CREATED);
     }
 
     private List<GameDto> getAllGames() {

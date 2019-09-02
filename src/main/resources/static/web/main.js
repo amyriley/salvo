@@ -23,12 +23,14 @@ var app = new Vue({
         {number: 1, type: "Submarine", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Destroyer", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false, placed: false}],
+        salvoes: [{turn: 1, positions: []}],
         shipLength: null,
         shipType: null,
         location: null,
         endLocation: null,
         possibleShipPositions: [],
         placing: false,
+        salvoCount: 0
     },
     methods: {
         fetchData: function() {
@@ -427,6 +429,85 @@ var app = new Vue({
             }
 
             return id;
+        },
+        selectSalvoLocation: function(id) {
+            if (this.canPlaceSalvo(id) && this.getAllPlacedSalvoPositions().length < 5) {
+                this.showSalvoLocation(id);
+            } else {
+                alert("You cannot fire a shot here!");
+            }
+
+            return id;
+        },
+        removePlacedSalvo: function(position) {
+            for (var i = 0; this.salvoes.length; i++) {
+                var salvo = this.salvoes[i];
+
+                for (var j = 0; salvo.positions; j++) {
+                    if (salvo.positions[j] == position) {
+                        salvo.positions.splice(j, 1)
+                        console.log("removed " + salvo.positions[j]);
+                    }
+                }
+            }
+
+            console.log(this.salvoes);
+
+            return position;
+        },
+        showSalvoLocation: function(location) {
+            var table = document.getElementById("salvoTable");
+            var targetTDs = table.querySelectorAll('td');
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var tdId = targetTDs[i].id;
+
+                if (tdId == location) {
+                    targetTDs[i].style.backgroundColor = "black";
+                }
+            }
+
+            this.setSalvoPosition(location);
+
+            return location;
+        },
+        setSalvoPosition: function(position) {
+            for (var i = 0; this.salvoes.length; i++) {
+                console.log(this.salvoes[i]);
+                this.salvoes[i].positions.push(position);
+            }
+
+            console.log("salvoes " + JSON.stringify(this.salvoes));
+
+            return position;
+        },
+        canPlaceSalvo: function(position) {
+            var allPositions = this.getAllPlacedSalvoPositions();
+            console.log("allPositions " + allPositions);
+
+            for (var i = 0; i < allPositions.length; i++) {
+                var alreadyPlacedPosition = allPositions[i];
+
+                if (alreadyPlacedPosition == position) {
+                    return false;
+                }
+            }
+
+            return true;
+        },
+        getAllPlacedSalvoPositions: function() {
+            var allPlacedSalvoPositions = [];
+
+            for (var i = 0; i < this.salvoes.length; i++) {
+                if (this.salvoes[i].positions.length != 0) {
+                    for (var j = 0; j < this.salvoes[i].positions.length; j++) {
+                        allPlacedSalvoPositions.push(this.salvoes[i].positions[j]);
+                    }
+                } 
+            }
+
+            console.log(allPlacedSalvoPositions.length)
+            return allPlacedSalvoPositions;
         },
         checkIfValidFinalLocation: function(location) {
             var endpoints = this.calculateShipEndLocation(location);
