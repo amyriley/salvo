@@ -25,14 +25,10 @@ var app = new Vue({
         {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false, placed: false}],
         shipLength: null,
         shipType: null,
-        firstLocation: null,
         location: null,
         endLocation: null,
-        testLocation: null,
         possibleShipPositions: [],
-        stage: 1,
-        illegalPositions: [],
-        placing: false
+        placing: false,
     },
     methods: {
         fetchData: function() {
@@ -52,7 +48,7 @@ var app = new Vue({
                     .then(response => response.json())
                     .then(data => {
                         console.log(data);
-                        this.setShipPositions(data);
+                        // this.setShipPositions(data);
                         this.setSalvoesFiredByGamePlayerId(data);
                         this.getSalvoesFiredByOpponent(data);
                         this.setHitPositions(data);
@@ -81,7 +77,6 @@ var app = new Vue({
                     this.games = games.games;
                     this.getPlayers(games.games);
                     this.getGamesList(games.games);
-                    this.shipLocations(7)
                 })
                 .catch(error => {
                     console.log(error);
@@ -133,28 +128,26 @@ var app = new Vue({
               })
               .catch(error => console.log(error))
         },
-        shipLocations: function(gamePlayerId) {
-            fetch("/api/games/players/" + gamePlayerId + "/ships", {
+        shipLocations: function() {
+            fetch("/api/games/players/" + this.gamePlayerId + "/ships", {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
-                  'Accept': 'application/json;charset=UTF-8',
-                  'Content-type': 'application/json;charset=UTF-8'
+                    'Accept': 'application/json;charset=UTF-8',
+                    'Content-type': 'application/json;charset=UTF-8'
                 },
-                body: JSON.stringify([ { "type": "test1", "locations": ["A1", "B1", "C1"] },
-                { "type": "test2", "locations": ["H5", "H6"] }
-                ])
-              })
-              .then(response => {
+                body: JSON.stringify(this.getShipLocations())
+                })
+                .then(response => {
                 console.log(response)
                 if (response.status == 201) {
-                  console.log("success!")
+                    console.log("Success!")
                 return response.json();
                 } else {
-                  alert("Error");
+                    alert("Error");
                 }
-              })
-              .catch(error => console.log(error))
+                })
+                .catch(error => console.log(error))
         },
         selectShip: function() {
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
@@ -170,6 +163,21 @@ var app = new Vue({
             }
 
             return shipLength;
+        },
+        allShipsPlaced: function() {
+            var placed = [];
+
+            for (var i = 0; i < this.ships.length; i++) {
+                placed.push(this.ships[i].placed);
+            }
+
+            if (placed.includes(false)) {
+                return false;
+            }
+
+            console.log("placed " + placed)
+
+            return true;
         },
         showStartLocation: function(location) {
             var table = document.getElementById("gameTable");
@@ -339,7 +347,7 @@ var app = new Vue({
 
             this.showFinalShipPositions(finalPositions);
 
-            console.log(this.ships);
+            return finalPositions;
         },
         canPlaceShip: function(finalPositions) {
             var allPositions = this.getAllPlacedShipPositions();
@@ -391,15 +399,6 @@ var app = new Vue({
 
             return allPlacedShipPositions;
         },
-        shipPositions: function() {
-            var shipPositions = [];
-
-            for (var i = 0; i < this.ships.length; i++) {
-                shipPositions.push(this.ships[i].positions);
-            }
-
-            return shipPositions;
-        },
         showAllShips: function(allShips) {
             var table = document.getElementById("gameTable");
             var targetTDs = table.querySelectorAll("td");
@@ -436,8 +435,6 @@ var app = new Vue({
                 var result = self.canPlaceShip(finalPositions);
                 validPositionChecks.push(result);
             })
-
-            console.log("validPositionChecks " + validPositionChecks);
 
             if (!validPositionChecks.includes(true)) {
                 alert("There are no valid positions available here!")
@@ -744,16 +741,16 @@ var app = new Vue({
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, ' '));
         },
-        getShipLocations: function(data) {
-            var ships = data.ships;
+        getShipLocations: function() {
+            var ships = this.ships;
             var shipLocations = [];
         
             for (var i = 0; i < ships.length; i++) {
-                var locations = ships[i].locations;
-                locations.forEach((x) => shipLocations.push(x));
+                var ship = ships[i];
+                shipLocations.push({type: ship.type, locations: ship.positions});
             }
 
-           return shipLocations;
+            return shipLocations;
         },
         setShipPositions: function(data) {
             var shipLocations = this.getShipLocations(data);

@@ -163,7 +163,7 @@ public class SalvoController {
     }
 
     @RequestMapping(value = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> shipLocations(@PathVariable Long gamePlayerId, @RequestBody Set<Ship> ships, Authentication authentication) {
+    public ResponseEntity<String> shipLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Ship> ships) {
 
         Player currentUser = playerRepository.findByUsername(authentication.getName());
 

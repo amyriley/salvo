@@ -42,13 +42,16 @@
                                 <td>{{ship.number}}</td>
                                 <td>{{ship.type}}</td>
                                 <td>{{ship.length}}</td>
-                                <td>
+                                <td >
                                     <input v-on:change="selectShip" type="radio" name="ship_selector" :id="ship.type" :value="ship.length">
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div>
+                <button :id="confirm-ships" v-on:click="shipLocations" type="submit" class="btn btn-primary">Confirm ships</button>
             </div>
             <div class="row">
                 <div class="col-sm">
