@@ -23,7 +23,7 @@ var app = new Vue({
         {number: 1, type: "Submarine", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Destroyer", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false, placed: false}],
-        salvoes: [{turn: 1, positions: []}],
+        salvo: {turn: 1, positions: []},
         shipLength: null,
         shipType: null,
         location: null,
@@ -431,29 +431,13 @@ var app = new Vue({
             return id;
         },
         selectSalvoLocation: function(id) {
-            if (this.canPlaceSalvo(id) && this.getAllPlacedSalvoPositions().length < 5) {
-                this.showSalvoLocation(id);
+            if (this.canPlaceSalvo(id) && this.salvo.positions.length < 5) {
+                this.setSalvoPosition(id);
             } else {
                 alert("You cannot fire a shot here!");
             }
 
             return id;
-        },
-        removePlacedSalvo: function(position) {
-            for (var i = 0; this.salvoes.length; i++) {
-                var salvo = this.salvoes[i];
-
-                for (var j = 0; salvo.positions; j++) {
-                    if (salvo.positions[j] == position) {
-                        salvo.positions.splice(j, 1)
-                        console.log("removed " + salvo.positions[j]);
-                    }
-                }
-            }
-
-            console.log(this.salvoes);
-
-            return position;
         },
         showSalvoLocation: function(location) {
             var table = document.getElementById("salvoTable");
@@ -461,29 +445,59 @@ var app = new Vue({
 
             for (var i = 0; i < targetTDs.length; i++) {
                 var tdId = targetTDs[i].id;
+                var self = this;
 
                 if (tdId == location) {
                     targetTDs[i].style.backgroundColor = "black";
+                    targetTDs[i].onclick = (function(location){
+                        return function(){
+                            self.changeBackgroundColor(location);
+                            self.removeSalvoPosition(location);
+                        }
+                    })(location);
                 }
             }
 
-            this.setSalvoPosition(location);
-
             return location;
         },
-        setSalvoPosition: function(position) {
-            for (var i = 0; this.salvoes.length; i++) {
-                console.log(this.salvoes[i]);
-                this.salvoes[i].positions.push(position);
+        changeBackgroundColor: function(tdId) {
+            var table = document.getElementById("salvoTable");
+            var targetTDs = table.querySelectorAll("td");
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var td = targetTDs[i].id;
+
+                if (td == tdId) {
+                    targetTDs[i].style.backgroundColor = "white";
+                }
             }
 
-            console.log("salvoes " + JSON.stringify(this.salvoes));
+            return tdId;
+        },
+        removeSalvoPosition: function(position) {
+            var index = this.salvo.positions.indexOf(position);
+
+            if (index > -1) {
+                this.salvo.positions.splice(index, 1);
+            }
+
+            alert("Shot removed");
+            console.log("after remove " + this.salvo.positions);
+
+            return position;
+        },
+        setSalvoPosition: function(position) {
+            var salvo = this.salvo;
+
+            salvo.positions.push(position);
+            console.log("salvo positions " + salvo.positions);
+
+            this.showSalvoLocation(position);
 
             return position;
         },
         canPlaceSalvo: function(position) {
-            var allPositions = this.getAllPlacedSalvoPositions();
-            console.log("allPositions " + allPositions);
+            var allPositions = this.salvo.positions;
 
             for (var i = 0; i < allPositions.length; i++) {
                 var alreadyPlacedPosition = allPositions[i];
@@ -494,20 +508,6 @@ var app = new Vue({
             }
 
             return true;
-        },
-        getAllPlacedSalvoPositions: function() {
-            var allPlacedSalvoPositions = [];
-
-            for (var i = 0; i < this.salvoes.length; i++) {
-                if (this.salvoes[i].positions.length != 0) {
-                    for (var j = 0; j < this.salvoes[i].positions.length; j++) {
-                        allPlacedSalvoPositions.push(this.salvoes[i].positions[j]);
-                    }
-                } 
-            }
-
-            console.log(allPlacedSalvoPositions.length)
-            return allPlacedSalvoPositions;
         },
         checkIfValidFinalLocation: function(location) {
             var endpoints = this.calculateShipEndLocation(location);
