@@ -21,7 +21,7 @@ public class Salvo {
 
     @ElementCollection
     @Column(name="locations")
-    private List<String> locations = new ArrayList<>(Arrays.asList());
+    private List<String> locations = new ArrayList<>();
 
     public Salvo() {}
 

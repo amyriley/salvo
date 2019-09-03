@@ -23,14 +23,15 @@ var app = new Vue({
         {number: 1, type: "Submarine", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Destroyer", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false, placed: false}],
-        salvo: {turn: 1, positions: []},
+        salvo: {turn: 1, locations: []},
+        salvoes: [],
         shipLength: null,
         shipType: null,
         location: null,
         endLocation: null,
         possibleShipPositions: [],
         placing: false,
-        salvoCount: 0
+        turn: 1
     },
     methods: {
         fetchData: function() {
@@ -157,6 +158,30 @@ var app = new Vue({
             } else {
                 alert("You need to place all ships before confirming!")
             }
+        },
+        sendSalvoLocations: function() {
+            this.salvoes.push(this.salvo);
+            console.log("test " + JSON.stringify(this.salvoes))
+
+            fetch("/api/games/players/" + this.gamePlayerId + "/salvos", {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json;charset=UTF-8',
+                'Content-type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify(this.salvoes)
+            })
+            .then(response => {
+            console.log(response)
+            if (response.status == 201) {
+                console.log("Success!")
+            return response.json();
+            } else {
+                alert("Error");
+            }
+            })
+            .catch(error => console.log(error))
         },
         selectShip: function() {
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
@@ -431,17 +456,20 @@ var app = new Vue({
             return id;
         },
         selectSalvoLocation: function(id) {
-            if (this.canPlaceSalvo(id) && this.salvo.positions.length < 5) {
+            if (this.canPlaceSalvo(id) && this.salvo.locations.length < 5) {
                 this.setSalvoPosition(id);
-            } else {
-                alert("You cannot fire a shot here!");
-            }
-
+            } 
+            
             return id;
+        },
+        getSalvoes: function() {
+            this.salvoes.push(this.salvo);
+            
+            return this.salvoes;
         },
         showSalvoLocation: function(location) {
             var table = document.getElementById("salvoTable");
-            var targetTDs = table.querySelectorAll('td');
+            var targetTDs = table.querySelectorAll("td");
 
             for (var i = 0; i < targetTDs.length; i++) {
                 var tdId = targetTDs[i].id;
@@ -475,29 +503,29 @@ var app = new Vue({
             return tdId;
         },
         removeSalvoPosition: function(position) {
-            var index = this.salvo.positions.indexOf(position);
+            var index = this.salvo.locations.indexOf(position);
 
             if (index > -1) {
-                this.salvo.positions.splice(index, 1);
+                this.salvo.locations.splice(index, 1);
             }
 
             alert("Shot removed");
-            console.log("after remove " + this.salvo.positions);
+            console.log("after remove " + this.salvo.locations);
 
             return position;
         },
         setSalvoPosition: function(position) {
             var salvo = this.salvo;
 
-            salvo.positions.push(position);
-            console.log("salvo positions " + salvo.positions);
+            salvo.locations.push(position);
+            console.log("salvo positions " + salvo.locations);
 
             this.showSalvoLocation(position);
 
             return position;
         },
         canPlaceSalvo: function(position) {
-            var allPositions = this.salvo.positions;
+            var allPositions = this.salvo.locations;
 
             for (var i = 0; i < allPositions.length; i++) {
                 var alreadyPlacedPosition = allPositions[i];

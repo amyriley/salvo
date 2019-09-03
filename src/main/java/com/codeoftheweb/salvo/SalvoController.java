@@ -36,6 +36,7 @@ public class SalvoController {
         this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
         this.shipRepository = shipRepository;
+        this.salvoRepository = salvoRepository;
     }
 
     @RequestMapping(value = "/username")
