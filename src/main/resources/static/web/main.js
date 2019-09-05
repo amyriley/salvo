@@ -25,6 +25,7 @@ var app = new Vue({
         {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false, placed: false}],
         salvo: {turn: 1, locations: []},
         salvoes: [],
+        salvoTable: "salvoTable",
         shipLength: null,
         shipType: null,
         location: null,
@@ -454,107 +455,74 @@ var app = new Vue({
 
             return id;
         },
-        addAvailableAttribute: function() {
-            var table = document.getElementById("salvoTable");
-            var targetTDs = table.querySelectorAll("td");
-
-            for (var i = 0; i < targetTDs.length; i++) {
-                var td = targetTDs[i];
-                td.setAttribute("available", true);
-            }
-        },
         selectSalvoLocation: function(id) {
-            if (this.canPlaceSalvo(id) && this.salvo.locations.length < 5) {
-                this.setSalvoPosition(id);
-            } 
+            var coordinate = this.getCoordinate(id);
+            var element = this.getElement(id);
 
-            else {
-                this.removeSalvoPosition(id)
+            if (this.canPlaceSalvo(coordinate) && this.salvo.locations.length < 5) {
+                this.setSalvoPosition(coordinate, element);
+            } else if (!this.canPlaceSalvo(coordinate)) {
+                this.removeSalvoPosition(coordinate, element);
+            } else {
+                alert("You've already fired the maximum 5 shots!");
             }
         },
-        getSalvoes: function() {
-            this.salvoes.push(this.salvo);
-            
-            return this.salvoes;
+        getCoordinate: function(id) {
+            var element = document.getElementById(id);
+            var coordinate = element.id;
+
+            return coordinate;
         },
-        showSalvoLocation: function(location) {
-            var table = document.getElementById("salvoTable");
-            var targetTDs = table.querySelectorAll("td");
+        getElement: function(id) {
+            var element = document.getElementById(id);
 
-            for (var i = 0; i < targetTDs.length; i++) {
-                var tdId = targetTDs[i].id;
-                var self = this;
-
-                if (tdId == location) {
-                    targetTDs[i].style.backgroundColor = "black";
-                    targetTDs[i].setAttribute("available", "false");
-                }
-            }
-
-            return location;
+            return element;
         },
-        changeBackgroundColor: function(tdId) {
-            var table = document.getElementById("salvoTable");
-            var targetTDs = table.querySelectorAll("td");
-
-            for (var i = 0; i < targetTDs.length; i++) {
-                var td = targetTDs[i].id;
-
-                if (td == tdId) {
-                    targetTDs[i].style.backgroundColor = "white";
-                }
-            }
-
-            return tdId;
-        },
-        removeSalvoPosition: function(position) {
-            this.changeBackgroundColor(position);
-
-            var index = this.salvo.locations.indexOf(position);
-
-            if (index > -1) {
-                this.salvo.locations.splice(index, 1);
-            }
-
-            console.log("salvo locations after remove: " + this.salvo.locations);
-
-            var table = document.getElementById("salvoTable");
-            var targetTDs = table.querySelectorAll("td");
-
-            for (var i = 0; i < targetTDs.length; i++) {
-                var td = targetTDs[i]
-                var tdId = targetTDs[i].id;
-
-                if (tdId == position) {
-                    td.setAttribute("available", "true");
-                }
-            }
-
-            alert("Shot " + position + " removed");
-
-        },
-        setSalvoPosition: function(position) {
-            var salvo = this.salvo;
-
-            salvo.locations.push(position);
-            console.log("salvo positions " + salvo.locations);
-
-            this.showSalvoLocation(position);
-
-            return position;
-        },
-        canPlaceSalvo: function(position) {
+        canPlaceSalvo: function(coordinate) {
             var allPositions = this.salvo.locations;
+            var newCoordinate = coordinate.substring(10);
 
             for (var i = 0; i < allPositions.length; i++) {
                 var alreadyPlacedPosition = allPositions[i];
 
-                if (alreadyPlacedPosition == position) {
+                if (alreadyPlacedPosition == newCoordinate) {
                     return false;
                 }
             }
 
             return true;
+        },
+        setSalvoPosition: function(coordinate, element) {
+            var salvo = this.salvo;
+            var newCoordinate = coordinate.substring(10);
+
+            salvo.locations.push(newCoordinate);
+            console.log("salvo positions " + salvo.locations);
+
+            this.changeElementBackgroundColor(element, "black");
+        },
+        removeSalvoPosition: function(coordinate, element) {
+            var newCoordinate = coordinate.substring(10);
+    
+            var index = this.salvo.locations.indexOf(newCoordinate);
+
+            if (index > -1) {
+                this.salvo.locations.splice(index, 1);
+            }
+
+            this.changeElementBackgroundColor(element, "white");
+
+            console.log("salvo locations after remove: " + this.salvo.locations);
+
+            alert("Shot " + newCoordinate + " removed");
+        },
+        changeElementBackgroundColor: function(element, color) {
+            element.style.backgroundColor = color;
+        },
+        getSalvoes: function() {
+            this.salvoes.push(this.salvo);
+            
+            return this.salvoes;
         },
         checkIfValidFinalLocation: function(location) {
             var endpoints = this.calculateShipEndLocation(location);
@@ -1011,7 +979,4 @@ var app = new Vue({
     created: function () {
         this.fetchData();
     },
-    mounted: function(){
-        this.addAvailableAttribute();
-  },
 });
