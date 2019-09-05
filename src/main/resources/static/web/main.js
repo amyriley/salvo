@@ -31,7 +31,6 @@ var app = new Vue({
         endLocation: null,
         possibleShipPositions: [],
         placing: false,
-        turn: 1
     },
     methods: {
         fetchData: function() {
@@ -455,12 +454,23 @@ var app = new Vue({
 
             return id;
         },
+        addAvailableAttribute: function() {
+            var table = document.getElementById("salvoTable");
+            var targetTDs = table.querySelectorAll("td");
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var td = targetTDs[i];
+                td.setAttribute("available", true);
+            }
+        },
         selectSalvoLocation: function(id) {
             if (this.canPlaceSalvo(id) && this.salvo.locations.length < 5) {
                 this.setSalvoPosition(id);
             } 
-            
-            return id;
+
+            else {
+                this.removeSalvoPosition(id)
+            }
         },
         getSalvoes: function() {
             this.salvoes.push(this.salvo);
@@ -477,12 +487,7 @@ var app = new Vue({
 
                 if (tdId == location) {
                     targetTDs[i].style.backgroundColor = "black";
-                    targetTDs[i].onclick = (function(location){
-                        return function(){
-                            self.changeBackgroundColor(location);
-                            self.removeSalvoPosition(location);
-                        }
-                    })(location);
+                    targetTDs[i].setAttribute("available", "false");
                 }
             }
 
@@ -503,16 +508,30 @@ var app = new Vue({
             return tdId;
         },
         removeSalvoPosition: function(position) {
+            this.changeBackgroundColor(position);
+
             var index = this.salvo.locations.indexOf(position);
 
             if (index > -1) {
                 this.salvo.locations.splice(index, 1);
             }
 
-            alert("Shot removed");
-            console.log("after remove " + this.salvo.locations);
+            console.log("salvo locations after remove: " + this.salvo.locations);
 
-            return position;
+            var table = document.getElementById("salvoTable");
+            var targetTDs = table.querySelectorAll("td");
+
+            for (var i = 0; i < targetTDs.length; i++) {
+                var td = targetTDs[i]
+                var tdId = targetTDs[i].id;
+
+                if (tdId == position) {
+                    td.setAttribute("available", "true");
+                }
+            }
+
+            alert("Shot " + position + " removed");
+
         },
         setSalvoPosition: function(position) {
             var salvo = this.salvo;
@@ -992,4 +1011,7 @@ var app = new Vue({
     created: function () {
         this.fetchData();
     },
+    mounted: function(){
+        this.addAvailableAttribute();
+  },
 });
