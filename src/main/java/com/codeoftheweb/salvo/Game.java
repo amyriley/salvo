@@ -19,6 +19,9 @@ public class Game {
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
     Set<Score> scores;
 
+    @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
+    Set<Turn> turns;
+
     public Game() {}
 
     public long getId() {
@@ -56,5 +59,13 @@ public class Game {
 
     public void setScores(Set<Score> scores) {
         this.scores = scores;
+    }
+
+    public Set<Turn> getTurns() {
+        return turns;
+    }
+
+    public void setTurns(Set<Turn> turns) {
+        this.turns = turns;
     }
 }

@@ -65,7 +65,7 @@
                             </thead>
                             <tbody v-for="letter in rows" id="table-rows-salvo">
                                     <th>{{letter}}</th>
-                                    <td :value="letter + number" v-on:click="selectSalvoLocation(salvoTable + letter + number)" style='width: 50px' v-for="number in headers" :id="salvoTable + letter + number"></td>
+                                    <td v-on:click="selectSalvoLocation(salvoTable + letter + number)" style='width: 50px' v-for="number in headers" :id="salvoTable + letter + number"></td>
                             </tbody>
                     </table>
                 </div>
@@ -73,6 +73,31 @@
                     <button :id="confirm-salvo" v-on:click="sendSalvoLocations" type="submit" class="btn btn-primary">Confirm salvo</button>
                 </div>
             </div>
+            <div class="row">
+                    <div class="col-sm">
+                        <h4>Game stats</h4>
+                        <table id="gameStatsTable" class="table table-bordered" style="width: 500px">
+                            <thead id="table-headers-game-stats">
+                                <tr>
+                                    <th rowspan="2">Turn</th>
+                                    <th colspan="2">Hits on you</th>
+                                    <th colspan="2">Hits on opponent</th>
+                                </tr>
+                                <tr>
+                                    <th>Hits</th>
+                                    <th>Ships left</th>
+                                    <th>Hits</th>
+                                    <th>Ships left</th>
+                                </tr>
+                            </thead>
+                            <tbody v-for="turn in gameStats" id="table-rows-game-stats">
+                                <td>{{turn.turn}}</td>
+                                <td>{{turn.shipType}}: {{turn.numberOfHits}}</td>
+                                <td>{{turn.shipsLeft}}</td>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>

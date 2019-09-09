@@ -29,6 +29,17 @@ public class Ship {
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
 
+    public Set<Hit> getHits() {
+        return hits;
+    }
+
+    public void setHits(Set<Hit> hits) {
+        this.hits = hits;
+    }
+
+    @OneToMany(mappedBy="ship", fetch=FetchType.EAGER)
+    Set<Hit> hits;
+
     public Ship() {}
 
     public Ship (String type) {

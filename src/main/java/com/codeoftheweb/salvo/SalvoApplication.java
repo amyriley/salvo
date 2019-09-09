@@ -162,7 +162,7 @@ public class SalvoApplication {
 			g1.addSalvo(salvo2Jack);
 			GamePlayerRepository.save(g1);
 			SalvoRepository.save(salvo1Jack);
-			SalvoRepository.save(salvo2Jack);
+//			SalvoRepository.save(salvo2Jack);
 
 			Salvo salvo1Chloe = new Salvo(1);
 			Salvo salvo2Chloe = new Salvo(2);
@@ -179,7 +179,7 @@ public class SalvoApplication {
 			g2.addSalvo(salvo2Chloe);
 			GamePlayerRepository.save(g2);
 			SalvoRepository.save(salvo1Chloe);
-			SalvoRepository.save(salvo2Chloe);
+//			SalvoRepository.save(salvo2Chloe);
 
 			Score score1 = new Score(0);
 			score1.setGame(game1);

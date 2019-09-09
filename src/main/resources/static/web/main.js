@@ -32,8 +32,195 @@ var app = new Vue({
         endLocation: null,
         possibleShipPositions: [],
         placing: false,
+        game: {
+            "id": 1,
+            "created": "2019-09-05T14:14:06.289+0000",
+            "gamePlayers": [
+                {
+                    "id": 8,
+                    "player": {
+                        "id": 2,
+                        "email": "c.obrian@ctu.gov"
+                    },
+                    "salvoes": [
+                        {
+                            "turn": 2,
+                            "locations": [
+                                "E1",
+                                "H3",
+                                "A2"
+                            ],
+                            "hits": [
+                                "XX",
+                                "XX"
+                            ]
+                        },
+                        {
+                            "turn": 1,
+                            "locations": [
+                                "B4",
+                                "B5",
+                                "B6"
+                            ],
+                            "hits": [
+                                "XX",
+                                "XX"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "player": {
+                        "id": 1,
+                        "email": "j.bauer@ctu.gov"
+                    },
+                    "salvoes": [
+                        {
+                            "turn": 1,
+                            "locations": [
+                                "B5",
+                                "C5",
+                                "F1"
+                            ],
+                            "hits": [
+                                "XX",
+                                "XX"
+                            ]
+                        },
+                        {
+                            "turn": 2,
+                            "locations": [
+                                "F2",
+                                "D5"
+                            ],
+                            "hits": [
+                                "XX",
+                                "XX"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "ships": [
+                {
+                    "type": "patrol boat",
+                    "locations": [
+                        "B4",
+                        "B5"
+                    ],            
+                    "hits": [
+                        {
+                            "turn": 1,
+                            "locations": ["XX"]    
+                        },
+                        {
+                            "turn": 2,
+                            "locations": ["XX"]
+                        }
+                    ],
+                    "sunk": false
+                },
+                {
+                    "type": "destroyer",
+                    "locations": [
+                        "H2",
+                        "H3",
+                        "H4"
+                    ],
+                    "hits": [
+                        {
+                            "turn": 1,
+                            "locations": ["XX"]    
+                        },
+                        {
+                            "turn": 2,
+                            "locations": ["XX"]
+                        }
+                    ],
+                    "sunk": false
+                },
+                {
+                    "type": "submarine",
+                    "locations": [
+                        "E1",
+                        "F1",
+                        "G1"
+                    ],
+                    "hits": [
+                        {
+                            "turn": 1,
+                            "locations": ["XX"]    
+                        },
+                        {
+                            "turn": 2,
+                            "locations": ["XX"]
+                        }
+                    ],
+                    "sunk": false
+                }
+            ]
+        },
+        gameStats: []
+        // gameStats: [
+        //     {
+        //         hitsOnYou: {
+
+        //         }
+        //     }, 
+        //     {
+        //         hitsOnOpponent: {
+
+        //         }
+        //     }
+        // ]      
     },
     methods: {
+        gameView: function() {
+            console.log(this.game);
+        },
+        hitsOnYou: function() {
+            var ships = this.game.ships;
+            var hitsOnYou = {};
+
+            for (var i = 0; i < ships.length; i++) {
+                var ship = ships[i];
+                var shipType = ships[i].type;
+                var sunk = ships[i].sunk;
+
+                for (var j = 0; j < ship.hits.length; j++) {
+                    var numberOfHits = ship.hits[j].locations.length;
+                    var turn = ship.hits[j].turn;
+                }
+
+                hitsOnYou = {turn: turn, shipType: shipType, numberOfHits: numberOfHits, sunk: sunk, shipsLeft: 3};
+            }
+
+            this.gameStats.push(hitsOnYou);
+
+            console.log(this.gameStats);
+            
+            return hitsOnYou;
+        },
+        hitsOnOpponent: function() {
+            var gamePlayers = this.game.gamePlayers;
+            var hitsOnOpponent = [];
+
+            for (var i = 0; i < gamePlayers.length; i++) {
+                var gamePlayer = gamePlayers[i];
+
+                if (gamePlayer.id == this.gamePlayerId) {
+
+                    for (var j = 0; j < gamePlayer.length; j++) {
+                        var salvoes = gamePlayer[j].salvoes;
+                    }
+                    
+                    hitsOnOpponent.push({turn: salvoes.turn, shipType: salvoes.shipType, numberOfHits: salvoes.hits.length})
+                }
+            }
+
+            return hitsOnOpponent;
+        },
         fetchData: function() {
 
             this.gamePlayerId = this.getParameterByName("gp");
@@ -468,8 +655,8 @@ var app = new Vue({
             }
         },
         getCoordinate: function(id) {
-            var element = document.getElementById(id);
-            var coordinate = element.id;
+            var elementId = document.getElementById(id).id;
+            var coordinate = elementId.substring(10);
 
             return coordinate;
         },
@@ -480,12 +667,11 @@ var app = new Vue({
         },
         canPlaceSalvo: function(coordinate) {
             var allPositions = this.salvo.locations;
-            var newCoordinate = coordinate.substring(10);
 
             for (var i = 0; i < allPositions.length; i++) {
                 var alreadyPlacedPosition = allPositions[i];
 
-                if (alreadyPlacedPosition == newCoordinate) {
+                if (alreadyPlacedPosition == coordinate) {
                     return false;
                 }
             }
@@ -494,17 +680,14 @@ var app = new Vue({
         },
         setSalvoPosition: function(coordinate, element) {
             var salvo = this.salvo;
-            var newCoordinate = coordinate.substring(10);
 
-            salvo.locations.push(newCoordinate);
+            salvo.locations.push(coordinate);
             console.log("salvo positions " + salvo.locations);
 
             this.changeElementBackgroundColor(element, "black");
         },
-        removeSalvoPosition: function(coordinate, element) {
-            var newCoordinate = coordinate.substring(10);
-    
-            var index = this.salvo.locations.indexOf(newCoordinate);
+        removeSalvoPosition: function(coordinate, element) {    
+            var index = this.salvo.locations.indexOf(coordinate);
 
             if (index > -1) {
                 this.salvo.locations.splice(index, 1);
@@ -514,7 +697,7 @@ var app = new Vue({
 
             console.log("salvo locations after remove: " + this.salvo.locations);
 
-            alert("Shot " + newCoordinate + " removed");
+            alert("Shot " + coordinate + " removed");
         },
         changeElementBackgroundColor: function(element, color) {
             element.style.backgroundColor = color;
@@ -978,5 +1161,7 @@ var app = new Vue({
     },
     created: function () {
         this.fetchData();
+        this.gameView();
+        this.hitsOnYou();
     },
 });

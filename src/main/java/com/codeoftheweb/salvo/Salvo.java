@@ -17,11 +17,22 @@ public class Salvo {
     @JoinColumn(name="gamePlayer_id")
     private GamePlayer gamePlayer;
 
-    private int turn;
+    @OneToMany(mappedBy="salvo", fetch=FetchType.EAGER)
+    Set<Hit> hits;
 
     @ElementCollection
     @Column(name="locations")
     private List<String> locations = new ArrayList<>();
+
+    private int turn;
+
+    public Set<Hit> getHits() {
+        return hits;
+    }
+
+    public void setHits(Set<Hit> hits) {
+        this.hits = hits;
+    }
 
     public Salvo() {}
 

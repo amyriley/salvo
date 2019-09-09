@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.data.repository.init.ResourceReader.Type.JSON;
 
 @RestController
 @RequestMapping("/api")
@@ -23,6 +22,7 @@ public class SalvoController {
     private PasswordEncoder passwordEncoder;
     private ShipRepository shipRepository;
     private SalvoRepository salvoRepository;
+    private TurnRepository turnRepository;
 
     public SalvoController(
             GameRepository gameRepository,
@@ -30,13 +30,15 @@ public class SalvoController {
             PlayerRepository playerRepository,
             PasswordEncoder passwordEncoder,
             ShipRepository shipRepository,
-            SalvoRepository salvoRepository) {
+            SalvoRepository salvoRepository,
+            TurnRepository turnRepository) {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
         this.shipRepository = shipRepository;
         this.salvoRepository = salvoRepository;
+        this.turnRepository = turnRepository;
     }
 
     @RequestMapping(value = "/username")
@@ -76,11 +78,20 @@ public class SalvoController {
                 .map(score -> makeScoreDto(score))
                 .collect(toList());
 
+        List<TurnDto> turnDtos = gamePlayer.getGame().getTurns()
+                .stream()
+                .map(turn -> makeTurnDto(turn))
+                .collect(toList());
+
         dto.setId(gamePlayer.getGame().getId());
         dto.setCreated(gamePlayer.getGame().getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
         dto.setScores(scoreDtos);
+
+        getSalvoLocations(gamePlayerId);
+        calculateTurn(gamePlayerId);
+        calculateHits((gamePlayerId));
 
         return dto;
     }
@@ -245,6 +256,78 @@ public class SalvoController {
                 .collect(toList());
     }
 
+    private List<String> calculateHits(Long gamePlayerId) {
+
+        List<String> hits = new ArrayList<>();
+        List<String> salvoLocations = getSalvoLocations(gamePlayerId);
+        GamePlayer opponent = getOpponent(gamePlayerId);
+        Set<Ship> opponentShips = getOpponentShips(opponent);
+
+        for (Ship ship: opponentShips) {
+
+            for (String salvoLocation: salvoLocations) {
+
+                if (ship.getLocations().contains(salvoLocation)) {
+                    System.out.println("hit " + salvoLocation);
+                    System.out.println("ship type hit " + ship.getType());
+                }
+
+            }
+        }
+
+        return hits;
+    }
+
+    private GamePlayer getOpponent(Long gamePlayerId) {
+
+        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
+        GamePlayer opponent = new GamePlayer();
+        Set<GamePlayer> gamePlayers = currentGamePlayer.getGame().getGamePlayers();
+
+        for (GamePlayer gamePlayer: gamePlayers) {
+
+            if (gamePlayer.getId() != gamePlayerId) {
+                opponent = gamePlayerRepository.getOne(gamePlayer.getId());
+            }
+        }
+
+        return opponent;
+    }
+
+    private Set<Ship> getOpponentShips(GamePlayer opponent) {
+
+        Set<Ship> ships = opponent.getShips();
+
+        return ships;
+    }
+
+    private List<String> getSalvoLocations(Long gamePlayerId) {
+
+        List<String> salvoLocations = new ArrayList<String>();
+
+        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
+
+        Set<Salvo> salvoes = currentGamePlayer.getSalvoes();
+
+        for (Salvo salvo: salvoes) {
+            System.out.println("salvo locations: " + salvo.getLocations());
+            salvoLocations = salvo.getLocations();
+
+        }
+
+        return salvoLocations;
+    }
+
+    private int calculateTurn(Long gamePlayerId) {
+
+        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
+
+        int turn = currentGamePlayer.getSalvoes().size() + 1;
+        System.out.println("turn number: " + turn);
+
+        return turn;
+    }
+
     private GamePlayerDto makeGamePlayerDto(GamePlayer gamePlayer) {
 
         List<SalvoDto> salvoDtos = gamePlayer.getSalvoes()
@@ -283,11 +366,17 @@ public class SalvoController {
                 .map(score -> makeScoreDto(score))
                 .collect(toList());
 
+        List<TurnDto> turnDtos = game.getTurns()
+                .stream()
+                .map(turn -> makeTurnDto(turn))
+                .collect(toList());
+
         GameDto dto = new GameDto();
         dto.setId(game.getId());
         dto.setCreated(game.getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setScores(scoreDtos);
+        dto.setTurns(turnDtos);
 
         return dto;
     }
@@ -338,4 +427,21 @@ public class SalvoController {
 
         return dto;
     }
+
+    private TurnDto makeTurnDto(Turn turn) {
+
+        TurnDto dto = new TurnDto();
+        dto.setOpponentShipsLeft(5);
+        dto.setTurnNumber(1);
+        dto.setYourShipsLeft(5);
+
+        return dto;
+    }
+
+//    private HitDto makeHitDto(Hit hit) {
+//
+//        HitDto dto = new HitDto();
+//
+//        return dto;
+//    }
 }

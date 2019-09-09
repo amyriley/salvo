@@ -10,6 +10,15 @@ public class GameDto {
     private List<GamePlayerDto> gamePlayers;
     private List<ShipDto> ships;
     private List<ScoreDto> scores;
+    private List<TurnDto> turns;
+
+    public List<TurnDto> getTurns() {
+        return turns;
+    }
+
+    public void setTurns(List<TurnDto> turns) {
+        this.turns = turns;
+    }
 
     public List<ShipDto> getShips() {
         return ships;
