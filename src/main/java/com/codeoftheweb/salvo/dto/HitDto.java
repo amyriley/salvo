@@ -2,8 +2,8 @@ package com.codeoftheweb.salvo.dto;
 
 public class HitDto {
 
-    private String shipType;
     private String location;
+    private String shipType;
 
     public String getShipType() {
         return shipType;

@@ -116,13 +116,6 @@ public class GamePlayer {
         return opponent;
     }
 
-    public long getGameId() {
-
-        long gameId = this.game.getId();
-
-        return gameId;
-    }
-
     public Set<Hit> getHits(Set<Salvo> salvoes) {
 
         List<String> salvoLocations = new ArrayList<String>();
@@ -145,6 +138,7 @@ public class GamePlayer {
                     Hit hit = new Hit();
                     hit.setLocation(salvoLocation);
                     hit.setShipType(ship.getType());
+                    hit.setShip(ship);
                     hits.add(hit);
                 }
             }

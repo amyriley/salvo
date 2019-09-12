@@ -237,9 +237,6 @@ public class SalvoApplication {
 			gameRepository.save(game1);
 			gameRepository.save(game2);
 			gameRepository.save(game3);
-
-			System.out.println("gameId " + g1.getGameId());
-//			System.out.println("getOpponent " + g1.getOpponent());
 		};
 
 	}

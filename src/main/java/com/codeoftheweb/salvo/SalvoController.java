@@ -90,9 +90,7 @@ public class SalvoController {
         dto.setScores(scoreDtos);
 
         System.out.println("get opponent: " + gamePlayer.getOpponent().getPlayer());
-        System.out.println("opponent salvoes: " + gamePlayer.getOpponent().getSalvoes());
         System.out.println("test " + gamePlayer.getHits(gamePlayer.getOpponent().getSalvoes()));
-//        System.out.println("calculateHits: " + calculateHits(gamePlayerId));
 
         return dto;
     }
@@ -392,10 +390,26 @@ public class SalvoController {
 
     private ShipDto makeShipDto(Ship ship) {
 
-        List<HitDto> hitDtos = ship.getHits()
-                .stream()
-                .map(hit -> makeHitDto(hit))
-                .collect(toList());
+        List<HitDto> hitDtos = new ArrayList<>();
+        Set<Hit> hits = ship.getGamePlayer().getHits(ship.getGamePlayer().getOpponent().getSalvoes());
+
+        for (Hit shipHit: hits) {
+
+                Set<Hit> allHits = ship.getGamePlayer().getHits(ship.getGamePlayer().getOpponent().getSalvoes());
+                Set<Hit> specificHits = new HashSet<>();
+
+                for (Hit nonSpecific: allHits) {
+                    
+                    if (nonSpecific.getShipType() == ship.getType()) {
+                        specificHits.add(nonSpecific);
+                    }
+                }
+
+                hitDtos = specificHits
+                        .stream()
+                        .map(hit -> makeHitDto(hit))
+                        .collect(toList());
+        }
 
         ShipDto dto = new ShipDto();
         dto.setType(ship.getType());
@@ -427,9 +441,12 @@ public class SalvoController {
 
     private HitDto makeHitDto(Hit hit) {
 
+        System.out.println("hit ship: " + hit.getShip());
+
+
         HitDto dto = new HitDto();
-        dto.setShipType(hit.getShipType());
         dto.setLocation(hit.getLocation());
+        dto.setShipType(hit.getShipType());
 
         return dto;
     }
