@@ -1,12 +1,8 @@
 package com.codeoftheweb.salvo;
 
-import com.codeoftheweb.salvo.Salvo;
-import com.codeoftheweb.salvo.Ship;
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+
 
 @Entity
 public class Hit {
@@ -17,14 +13,19 @@ public class Hit {
     private long id;
 
     private String shipType;
-
-    @ElementCollection
-    @Column(name="locations")
-    private List<String> locations = new ArrayList<>();
+    private String location;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "salvo")
-    private Salvo salvo;
+    @JoinColumn(name = "ship")
+    private Ship ship;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
     public Ship getShip() {
         return ship;
@@ -32,18 +33,6 @@ public class Hit {
 
     public void setShip(Ship ship) {
         this.ship = ship;
-    }
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ship")
-    private Ship ship;
-
-    public Salvo getSalvo() {
-        return salvo;
-    }
-
-    public void setSalvo(Salvo salvo) {
-        this.salvo = salvo;
     }
 
     public long getId() {
@@ -60,13 +49,5 @@ public class Hit {
 
     public void setShipType(String shipType) {
         this.shipType = shipType;
-    }
-
-    public List<String> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(List<String> locations) {
-        this.locations = locations;
     }
 }

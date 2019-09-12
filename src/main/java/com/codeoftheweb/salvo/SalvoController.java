@@ -23,6 +23,7 @@ public class SalvoController {
     private ShipRepository shipRepository;
     private SalvoRepository salvoRepository;
     private TurnRepository turnRepository;
+    private HitRepository hitRepository;
 
     public SalvoController(
             GameRepository gameRepository,
@@ -31,7 +32,8 @@ public class SalvoController {
             PasswordEncoder passwordEncoder,
             ShipRepository shipRepository,
             SalvoRepository salvoRepository,
-            TurnRepository turnRepository) {
+            TurnRepository turnRepository,
+            HitRepository hitRepository) {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
@@ -39,6 +41,7 @@ public class SalvoController {
         this.shipRepository = shipRepository;
         this.salvoRepository = salvoRepository;
         this.turnRepository = turnRepository;
+        this.hitRepository = hitRepository;
     }
 
     @RequestMapping(value = "/username")
@@ -55,7 +58,9 @@ public class SalvoController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        return new ResponseEntity<>(getOneGame(gamePlayerId), HttpStatus.CREATED);
+        GameDto gameDto = getOneGame(gamePlayerId);
+
+        return new ResponseEntity<>(gameDto, HttpStatus.CREATED);
     }
 
     private GameDto getOneGame(Long gamePlayerId) {
@@ -78,20 +83,16 @@ public class SalvoController {
                 .map(score -> makeScoreDto(score))
                 .collect(toList());
 
-        List<TurnDto> turnDtos = gamePlayer.getGame().getTurns()
-                .stream()
-                .map(turn -> makeTurnDto(turn))
-                .collect(toList());
-
         dto.setId(gamePlayer.getGame().getId());
         dto.setCreated(gamePlayer.getGame().getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
         dto.setScores(scoreDtos);
 
-        getSalvoLocations(gamePlayerId);
-        calculateTurn(gamePlayerId);
-        calculateHits((gamePlayerId));
+        System.out.println("get opponent: " + gamePlayer.getOpponent().getPlayer());
+        System.out.println("opponent salvoes: " + gamePlayer.getOpponent().getSalvoes());
+        System.out.println("test " + gamePlayer.getHits(gamePlayer.getOpponent().getSalvoes()));
+//        System.out.println("calculateHits: " + calculateHits(gamePlayerId));
 
         return dto;
     }
@@ -236,11 +237,9 @@ public class SalvoController {
         }
 
         for (Salvo salvo: salvoes) {
-            System.out.println(salvo.getTurn());
             System.out.println(salvo.getLocations());
             salvoRepository.save(salvo);
             gamePlayer.addSalvo(salvo);
-
         }
 
         gamePlayerRepository.save(gamePlayer);
@@ -256,43 +255,52 @@ public class SalvoController {
                 .collect(toList());
     }
 
-    private List<String> calculateHits(Long gamePlayerId) {
+//    private Set<Hit> calculateHits(Long gamePlayerId) {
+//
+//        GamePlayer currentGamePlayer;
+//        currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
+//
+//        Set<Hit> hits = new HashSet<>();
+//        List<String> salvoLocations = getSalvoLocations(gamePlayerId);
+//
+//        GamePlayer opponent = currentGamePlayer.getOpponent();
+//        Set<Ship> opponentShips = getOpponentShips(opponent);
+//
+//        for (Ship ship: opponentShips) {
+//
+//            for (String salvoLocation: salvoLocations) {
+//
+//                if (ship.getLocations().contains(salvoLocation)) {
+//                    System.out.println("hit: " + salvoLocation);
+//                    System.out.println("ship type hit: " + ship.getType());
+//                    Hit hit = new Hit();
+//                    hit.setLocation(salvoLocation);
+//                    hit.setShipType(ship.getType());
+//                    hitRepository.save(hit);
+//                    hits.add(hit);
+//                }
+//
+//            }
+//        }
+//
+//        return hits;
+//    }
 
-        List<String> hits = new ArrayList<>();
-        List<String> salvoLocations = getSalvoLocations(gamePlayerId);
-        GamePlayer opponent = getOpponent(gamePlayerId);
-        Set<Ship> opponentShips = getOpponentShips(opponent);
-
-        for (Ship ship: opponentShips) {
-
-            for (String salvoLocation: salvoLocations) {
-
-                if (ship.getLocations().contains(salvoLocation)) {
-                    System.out.println("hit " + salvoLocation);
-                    System.out.println("ship type hit " + ship.getType());
-                }
-
-            }
-        }
-
-        return hits;
-    }
-
-    private GamePlayer getOpponent(Long gamePlayerId) {
-
-        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
-        GamePlayer opponent = new GamePlayer();
-        Set<GamePlayer> gamePlayers = currentGamePlayer.getGame().getGamePlayers();
-
-        for (GamePlayer gamePlayer: gamePlayers) {
-
-            if (gamePlayer.getId() != gamePlayerId) {
-                opponent = gamePlayerRepository.getOne(gamePlayer.getId());
-            }
-        }
-
-        return opponent;
-    }
+//    private GamePlayer getOpponent(Long gamePlayerId) {
+//
+//        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
+//        GamePlayer opponent = new GamePlayer();
+//        Set<GamePlayer> gamePlayers = currentGamePlayer.getGame().getGamePlayers();
+//
+//        for (GamePlayer gamePlayer: gamePlayers) {
+//
+//            if (gamePlayer.getId() != gamePlayerId) {
+//                opponent = gamePlayerRepository.getOne(gamePlayer.getId());
+//            }
+//        }
+//
+//        return opponent;
+//    }
 
     private Set<Ship> getOpponentShips(GamePlayer opponent) {
 
@@ -316,16 +324,6 @@ public class SalvoController {
         }
 
         return salvoLocations;
-    }
-
-    private int calculateTurn(Long gamePlayerId) {
-
-        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
-
-        int turn = currentGamePlayer.getSalvoes().size() + 1;
-        System.out.println("turn number: " + turn);
-
-        return turn;
     }
 
     private GamePlayerDto makeGamePlayerDto(GamePlayer gamePlayer) {
@@ -366,17 +364,11 @@ public class SalvoController {
                 .map(score -> makeScoreDto(score))
                 .collect(toList());
 
-        List<TurnDto> turnDtos = game.getTurns()
-                .stream()
-                .map(turn -> makeTurnDto(turn))
-                .collect(toList());
-
         GameDto dto = new GameDto();
         dto.setId(game.getId());
         dto.setCreated(game.getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setScores(scoreDtos);
-        dto.setTurns(turnDtos);
 
         return dto;
     }
@@ -393,7 +385,6 @@ public class SalvoController {
     private SalvoDto makeSalvoDto(Salvo salvo) {
 
         SalvoDto dto = new SalvoDto();
-        dto.setTurn(salvo.getTurn());
         dto.setLocations(salvo.getLocations());
 
         return dto;
@@ -401,9 +392,15 @@ public class SalvoController {
 
     private ShipDto makeShipDto(Ship ship) {
 
+        List<HitDto> hitDtos = ship.getHits()
+                .stream()
+                .map(hit -> makeHitDto(hit))
+                .collect(toList());
+
         ShipDto dto = new ShipDto();
         dto.setType(ship.getType());
         dto.setLocations(ship.getLocations());
+        dto.setHits(hitDtos);
 
         return dto;
     }
@@ -428,20 +425,12 @@ public class SalvoController {
         return dto;
     }
 
-    private TurnDto makeTurnDto(Turn turn) {
+    private HitDto makeHitDto(Hit hit) {
 
-        TurnDto dto = new TurnDto();
-        dto.setOpponentShipsLeft(5);
-        dto.setTurnNumber(1);
-        dto.setYourShipsLeft(5);
+        HitDto dto = new HitDto();
+        dto.setShipType(hit.getShipType());
+        dto.setLocation(hit.getLocation());
 
         return dto;
     }
-
-//    private HitDto makeHitDto(Hit hit) {
-//
-//        HitDto dto = new HitDto();
-//
-//        return dto;
-//    }
 }

@@ -1,7 +1,6 @@
 package com.codeoftheweb.salvo;
 
 import org.hibernate.annotations.GenericGenerator;
-
 import javax.persistence.*;
 
 @Entity
@@ -15,10 +14,6 @@ public class Turn {
     private long turnNumber;
     private long yourShipsLeft;
     private long opponentShipsLeft;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "game_id")
-    private Game game;
 
     public Turn() {}
 
@@ -52,13 +47,5 @@ public class Turn {
 
     public void setOpponentShipsLeft(long opponentShipsLeft) {
         this.opponentShipsLeft = opponentShipsLeft;
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
     }
 }

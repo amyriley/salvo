@@ -14,31 +14,14 @@ public class Salvo {
     private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="gamePlayer_id")
+    @JoinColumn(name="game_player_id")
     private GamePlayer gamePlayer;
-
-    @OneToMany(mappedBy="salvo", fetch=FetchType.EAGER)
-    Set<Hit> hits;
 
     @ElementCollection
     @Column(name="locations")
     private List<String> locations = new ArrayList<>();
 
-    private int turn;
-
-    public Set<Hit> getHits() {
-        return hits;
-    }
-
-    public void setHits(Set<Hit> hits) {
-        this.hits = hits;
-    }
-
     public Salvo() {}
-
-    public Salvo (int turn) {
-        this.turn = turn;
-    }
 
     public long getId() {
         return id;
@@ -46,14 +29,6 @@ public class Salvo {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public int getTurn() {
-        return turn;
-    }
-
-    public void setTurn(int turn) {
-        this.turn = turn;
     }
 
     public List<String> getLocations() {

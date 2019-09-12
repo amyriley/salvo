@@ -1,11 +1,9 @@
 package com.codeoftheweb.salvo.dto;
 
-import java.util.List;
-
 public class HitDto {
 
     private String shipType;
-    private List<String> locations;
+    private String location;
 
     public String getShipType() {
         return shipType;
@@ -15,11 +13,11 @@ public class HitDto {
         this.shipType = shipType;
     }
 
-    public List<String> getLocations() {
-        return locations;
+    public String getLocation() {
+        return location;
     }
 
-    public void setLocations(List<String> locations) {
-        this.locations = locations;
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

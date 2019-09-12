@@ -26,8 +26,11 @@ public class Ship {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="gamePlayer_id")
+    @JoinColumn(name="game_player_id")
     private GamePlayer gamePlayer;
+
+    @OneToMany(mappedBy = "ship", fetch = FetchType.EAGER)
+    private Set<Hit> hits = new HashSet<>();
 
     public Set<Hit> getHits() {
         return hits;
@@ -36,9 +39,6 @@ public class Ship {
     public void setHits(Set<Hit> hits) {
         this.hits = hits;
     }
-
-    @OneToMany(mappedBy="ship", fetch=FetchType.EAGER)
-    Set<Hit> hits;
 
     public Ship() {}
 
@@ -72,5 +72,10 @@ public class Ship {
 
     public void setGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
+    }
+
+    public void addHit(Hit hit) {
+        hit.setShip(this);
+        hits.add(hit);
     }
 }

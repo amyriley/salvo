@@ -14,13 +14,10 @@ public class Game {
     private Date creationTime = new Date();
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
-    Set<GamePlayer> gamePlayers;
+    private Set<GamePlayer> gamePlayers;
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
-    Set<Score> scores;
-
-    @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
-    Set<Turn> turns;
+    private Set<Score> scores;
 
     public Game() {}
 
@@ -59,13 +56,5 @@ public class Game {
 
     public void setScores(Set<Score> scores) {
         this.scores = scores;
-    }
-
-    public Set<Turn> getTurns() {
-        return turns;
-    }
-
-    public void setTurns(Set<Turn> turns) {
-        this.turns = turns;
     }
 }

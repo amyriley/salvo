@@ -40,7 +40,14 @@ public class SalvoApplication {
 	PasswordEncoder passwordEncoder;
 
 	@Bean
-	public CommandLineRunner initData(PlayerRepository PlayerRepository, GameRepository GameRepository, GamePlayerRepository GamePlayerRepository, ShipRepository ShipRepository, SalvoRepository SalvoRepository, ScoreRepository ScoreRepository) {
+	public CommandLineRunner initData(
+			PlayerRepository playerRepository,
+			GameRepository gameRepository,
+			GamePlayerRepository gamePlayerRepository,
+			ShipRepository shipRepository,
+			SalvoRepository salvoRepository,
+			ScoreRepository scoreRepository)
+	{
 		return (args) -> {
 
 			Player jBauer = new Player("j.bauer@ctu.gov", passwordEncoder.encode("24"));
@@ -49,11 +56,11 @@ public class SalvoApplication {
 			Player tAlmeida = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
 			Player dPalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder.encode("eagle"));
 
-			PlayerRepository.save(jBauer);
-			PlayerRepository.save(cObrian);
-			PlayerRepository.save(kBauer);
-			PlayerRepository.save(tAlmeida);
-			PlayerRepository.save(dPalmer);
+			playerRepository.save(jBauer);
+			playerRepository.save(cObrian);
+			playerRepository.save(kBauer);
+			playerRepository.save(tAlmeida);
+			playerRepository.save(dPalmer);
 
 			Game game1 = new Game();
 			Game game2 = new Game();
@@ -65,11 +72,11 @@ public class SalvoApplication {
 			game2.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(3600)));
 			game3.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(7200)));
 
-			GameRepository.save(game1);
-			GameRepository.save(game2);
-			GameRepository.save(game3);
-			GameRepository.save(game4);
-			GameRepository.save(game5);
+			gameRepository.save(game1);
+			gameRepository.save(game2);
+			gameRepository.save(game3);
+			gameRepository.save(game4);
+			gameRepository.save(game5);
 
 			GamePlayer g1 = new GamePlayer(jBauer, game1);
 			GamePlayer g2 = new GamePlayer(cObrian, game1);
@@ -79,13 +86,19 @@ public class SalvoApplication {
 			GamePlayer g6 = new GamePlayer(kBauer, game3);
 			GamePlayer g7 = new GamePlayer(dPalmer, game4);
 
-			GamePlayerRepository.save(g1);
-			GamePlayerRepository.save(g2);
-			GamePlayerRepository.save(g3);
-			GamePlayerRepository.save(g4);
-			GamePlayerRepository.save(g5);
-			GamePlayerRepository.save(g6);
-			GamePlayerRepository.save(g7);
+			gamePlayerRepository.save(g1);
+			gamePlayerRepository.save(g2);
+			gamePlayerRepository.save(g3);
+			gamePlayerRepository.save(g4);
+			gamePlayerRepository.save(g5);
+			gamePlayerRepository.save(g6);
+			gamePlayerRepository.save(g7);
+
+			gameRepository.save(game1);
+			gameRepository.save(game2);
+			gameRepository.save(game3);
+			gameRepository.save(game4);
+			gameRepository.save(game5);
 
 			Ship ship1 = new Ship("carrier");
 			Ship ship2 = new Ship("battleship");
@@ -99,16 +112,16 @@ public class SalvoApplication {
 			Ship ship9 = new Ship("destroyer");
 			Ship ship10 = new Ship("patrol boat");
 
-			ShipRepository.save(ship1);
-			ShipRepository.save(ship2);
-			ShipRepository.save(ship3);
-			ShipRepository.save(ship4);
-			ShipRepository.save(ship5);
-			ShipRepository.save(ship6);
-			ShipRepository.save(ship7);
-			ShipRepository.save(ship8);
-			ShipRepository.save(ship9);
-			ShipRepository.save(ship10);
+			shipRepository.save(ship1);
+			shipRepository.save(ship2);
+			shipRepository.save(ship3);
+			shipRepository.save(ship4);
+			shipRepository.save(ship5);
+			shipRepository.save(ship6);
+			shipRepository.save(ship7);
+			shipRepository.save(ship8);
+			shipRepository.save(ship9);
+			shipRepository.save(ship10);
 
 			g3.addShip(ship5);
 			g3.addShip(ship3);
@@ -138,63 +151,63 @@ public class SalvoApplication {
 			List<String> patrolBoatLocationsChloe = new ArrayList<>(Arrays.asList("F1", "F2"));
 			ship10.setLocations(patrolBoatLocationsChloe);
 
-			ShipRepository.save(ship5);
-			ShipRepository.save(ship4);
-			ShipRepository.save(ship3);
-			ShipRepository.save(ship1);
-			ShipRepository.save(ship9);
-			ShipRepository.save(ship10);
-			GamePlayerRepository.save(g3);
-			GamePlayerRepository.save(g7);
+			shipRepository.save(ship5);
+			shipRepository.save(ship4);
+			shipRepository.save(ship3);
+			shipRepository.save(ship1);
+			shipRepository.save(ship9);
+			shipRepository.save(ship10);
+			gamePlayerRepository.save(g3);
+			gamePlayerRepository.save(g7);
 
-			Salvo salvo1Jack = new Salvo(1);
-			Salvo salvo2Jack = new Salvo(2);
+			Salvo salvo1Jack = new Salvo();
+			Salvo salvo2Jack = new Salvo();
 
 			List<String> salvo1JackLocations = new ArrayList<>(Arrays.asList("B5", "C5", "F1"));
 			salvo1Jack.setLocations(salvo1JackLocations);
-			SalvoRepository.save(salvo1Jack);
+			salvoRepository.save(salvo1Jack);
 
 			List<String> salvo2JackLocations = new ArrayList<>(Arrays.asList("F2", "D5"));
 			salvo2Jack.setLocations(salvo2JackLocations);
-			SalvoRepository.save(salvo2Jack);
+			salvoRepository.save(salvo2Jack);
 
 			g1.addSalvo(salvo1Jack);
 			g1.addSalvo(salvo2Jack);
-			GamePlayerRepository.save(g1);
-			SalvoRepository.save(salvo1Jack);
+			gamePlayerRepository.save(g1);
+			salvoRepository.save(salvo1Jack);
 //			SalvoRepository.save(salvo2Jack);
 
-			Salvo salvo1Chloe = new Salvo(1);
-			Salvo salvo2Chloe = new Salvo(2);
+			Salvo salvo1Chloe = new Salvo();
+			Salvo salvo2Chloe = new Salvo();
 
 			List<String> salvo1ChloeLocations = new ArrayList<>(Arrays.asList("B4", "B5", "B6"));
 			salvo1Chloe.setLocations(salvo1ChloeLocations);
-			SalvoRepository.save(salvo1Chloe);
+			salvoRepository.save(salvo1Chloe);
 
 			List<String> salvo2ChloeLocations = new ArrayList<>(Arrays.asList("E1", "H3", "A2"));
 			salvo2Chloe.setLocations(salvo2ChloeLocations);
-			SalvoRepository.save(salvo2Chloe);
+			salvoRepository.save(salvo2Chloe);
 
 			g2.addSalvo(salvo1Chloe);
 			g2.addSalvo(salvo2Chloe);
-			GamePlayerRepository.save(g2);
-			SalvoRepository.save(salvo1Chloe);
+			gamePlayerRepository.save(g2);
+			salvoRepository.save(salvo1Chloe);
 //			SalvoRepository.save(salvo2Chloe);
 
 			Score score1 = new Score(0);
 			score1.setGame(game1);
 			score1.setPlayer(jBauer);
-			ScoreRepository.save(score1);
+			scoreRepository.save(score1);
 
 			jBauer.addScore(score1);
-			PlayerRepository.save(jBauer);
+			playerRepository.save(jBauer);
 
 			Score score2 = new Score(1);
 			score2.setGame(game1);
 			score2.setPlayer(cObrian);
-			ScoreRepository.save(score2);
-			PlayerRepository.save(cObrian);
-			GameRepository.save(game1);
+			scoreRepository.save(score2);
+			playerRepository.save(cObrian);
+			gameRepository.save(game1);
 
 			Score score3 = new Score(0.5);
 			Score score4 = new Score(0.5);
@@ -212,17 +225,21 @@ public class SalvoApplication {
 			score5.setPlayer(jBauer);
 			score6.setPlayer(kBauer);
 
-			ScoreRepository.save(score3);
-			ScoreRepository.save(score4);
-			ScoreRepository.save(score5);
-			ScoreRepository.save(score6);
+			scoreRepository.save(score3);
+			scoreRepository.save(score4);
+			scoreRepository.save(score5);
+			scoreRepository.save(score6);
 
-			PlayerRepository.save(tAlmeida);
-			PlayerRepository.save(kBauer);
-			PlayerRepository.save(jBauer);
+			playerRepository.save(tAlmeida);
+			playerRepository.save(kBauer);
+			playerRepository.save(jBauer);
 
-			GameRepository.save(game2);
-			GameRepository.save(game3);
+			gameRepository.save(game1);
+			gameRepository.save(game2);
+			gameRepository.save(game3);
+
+			System.out.println("gameId " + g1.getGameId());
+//			System.out.println("getOpponent " + g1.getOpponent());
 		};
 
 	}

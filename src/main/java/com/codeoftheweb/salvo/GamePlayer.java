@@ -13,6 +13,15 @@ public class GamePlayer {
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
     private Date joinTime = new Date();
+    private int turn;
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "player_id")
@@ -28,8 +37,7 @@ public class GamePlayer {
     @OneToMany(mappedBy = "gamePlayer", fetch = FetchType.EAGER)
     private Set<Salvo> salvoes = new HashSet<>();
 
-    public GamePlayer() {
-    }
+    public GamePlayer() {}
 
     public GamePlayer(Player player, Game game) {
         this.player = player;
@@ -92,5 +100,56 @@ public class GamePlayer {
     public void addSalvo(Salvo salvo) {
         salvo.setGamePlayer(this);
         salvoes.add(salvo);
+    }
+
+    public GamePlayer getOpponent() {
+
+        GamePlayer opponent = new GamePlayer();
+        Set<GamePlayer> gamePlayers = this.getGame().getGamePlayers();
+
+        for (GamePlayer gamePlayer: gamePlayers) {
+            if (gamePlayer.getId() != this.id) {
+                opponent = gamePlayer;
+            }
+        }
+
+        return opponent;
+    }
+
+    public long getGameId() {
+
+        long gameId = this.game.getId();
+
+        return gameId;
+    }
+
+    public Set<Hit> getHits(Set<Salvo> salvoes) {
+
+        List<String> salvoLocations = new ArrayList<String>();
+
+        for (Salvo salvo: salvoes) {
+            System.out.println("salvo locations: " + salvo.getLocations());
+            salvoLocations = salvo.getLocations();
+        }
+
+        Set<Hit> hits = new HashSet<>();
+        Set<Ship> ships = this.getShips();
+
+        for (Ship ship: ships) {
+
+            for (String salvoLocation: salvoLocations) {
+
+                if (ship.getLocations().contains(salvoLocation)) {
+                    System.out.println("ship type hit: " + ship.getType());
+                    System.out.println("hit location: " + salvoLocation);
+                    Hit hit = new Hit();
+                    hit.setLocation(salvoLocation);
+                    hit.setShipType(ship.getType());
+                    hits.add(hit);
+                }
+            }
+        }
+
+        return hits;
     }
 }
