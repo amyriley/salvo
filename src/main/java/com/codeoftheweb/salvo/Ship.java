@@ -11,26 +11,22 @@ public class Ship {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
+
     private String type;
+    private boolean sunk;
+    public Ship() {}
+
+    @ElementCollection
+    @Column(name="hits")
+    private Set<Hit> hits = new HashSet<>();
 
     @ElementCollection
     @Column(name="locations")
     private List<String> locations = new ArrayList<>();
 
-    public List<String> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(List<String> locations) {
-        this.locations = locations;
-    }
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="game_player_id")
     private GamePlayer gamePlayer;
-
-    @OneToMany(mappedBy = "ship", fetch = FetchType.EAGER)
-    private Set<Hit> hits = new HashSet<>();
 
     public Set<Hit> getHits() {
         return hits;
@@ -40,7 +36,21 @@ public class Ship {
         this.hits = hits;
     }
 
-    public Ship() {}
+    public boolean isSunk() {
+        return sunk;
+    }
+
+    public void setSunk(boolean sunk) {
+        this.sunk = sunk;
+    }
+
+    public List<String> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
+    }
 
     public Ship (String type) {
         this.type = type;
@@ -75,7 +85,17 @@ public class Ship {
     }
 
     public void addHit(Hit hit) {
-        hit.setShip(this);
         hits.add(hit);
+    }
+
+    public boolean checkIfShipIsSunk() {
+
+        if (this.getHits().size() != this.getLocations().size()) {
+            this.setSunk(false);
+        } else {
+            this.setSunk(true);
+        }
+
+        return this.isSunk();
     }
 }

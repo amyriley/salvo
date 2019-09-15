@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -22,8 +23,6 @@ public class SalvoController {
     private PasswordEncoder passwordEncoder;
     private ShipRepository shipRepository;
     private SalvoRepository salvoRepository;
-    private TurnRepository turnRepository;
-    private HitRepository hitRepository;
 
     public SalvoController(
             GameRepository gameRepository,
@@ -31,17 +30,13 @@ public class SalvoController {
             PlayerRepository playerRepository,
             PasswordEncoder passwordEncoder,
             ShipRepository shipRepository,
-            SalvoRepository salvoRepository,
-            TurnRepository turnRepository,
-            HitRepository hitRepository) {
+            SalvoRepository salvoRepository) {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
         this.passwordEncoder = passwordEncoder;
         this.shipRepository = shipRepository;
         this.salvoRepository = salvoRepository;
-        this.turnRepository = turnRepository;
-        this.hitRepository = hitRepository;
     }
 
     @RequestMapping(value = "/username")
@@ -88,9 +83,6 @@ public class SalvoController {
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
         dto.setScores(scoreDtos);
-
-        System.out.println("get opponent: " + gamePlayer.getOpponent().getPlayer());
-        System.out.println("test " + gamePlayer.getHits(gamePlayer.getOpponent().getSalvoes()));
 
         return dto;
     }
@@ -253,53 +245,6 @@ public class SalvoController {
                 .collect(toList());
     }
 
-//    private Set<Hit> calculateHits(Long gamePlayerId) {
-//
-//        GamePlayer currentGamePlayer;
-//        currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
-//
-//        Set<Hit> hits = new HashSet<>();
-//        List<String> salvoLocations = getSalvoLocations(gamePlayerId);
-//
-//        GamePlayer opponent = currentGamePlayer.getOpponent();
-//        Set<Ship> opponentShips = getOpponentShips(opponent);
-//
-//        for (Ship ship: opponentShips) {
-//
-//            for (String salvoLocation: salvoLocations) {
-//
-//                if (ship.getLocations().contains(salvoLocation)) {
-//                    System.out.println("hit: " + salvoLocation);
-//                    System.out.println("ship type hit: " + ship.getType());
-//                    Hit hit = new Hit();
-//                    hit.setLocation(salvoLocation);
-//                    hit.setShipType(ship.getType());
-//                    hitRepository.save(hit);
-//                    hits.add(hit);
-//                }
-//
-//            }
-//        }
-//
-//        return hits;
-//    }
-
-//    private GamePlayer getOpponent(Long gamePlayerId) {
-//
-//        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
-//        GamePlayer opponent = new GamePlayer();
-//        Set<GamePlayer> gamePlayers = currentGamePlayer.getGame().getGamePlayers();
-//
-//        for (GamePlayer gamePlayer: gamePlayers) {
-//
-//            if (gamePlayer.getId() != gamePlayerId) {
-//                opponent = gamePlayerRepository.getOne(gamePlayer.getId());
-//            }
-//        }
-//
-//        return opponent;
-//    }
-
     private Set<Ship> getOpponentShips(GamePlayer opponent) {
 
         Set<Ship> ships = opponent.getShips();
@@ -390,31 +335,25 @@ public class SalvoController {
 
     private ShipDto makeShipDto(Ship ship) {
 
-        List<HitDto> hitDtos = new ArrayList<>();
+        List<HitDto> hitDtos;
         Set<Hit> hits = ship.getGamePlayer().getHits(ship.getGamePlayer().getOpponent().getSalvoes());
 
-        for (Hit shipHit: hits) {
+        Set<Hit> shipHits = hits.stream()
+                .filter(h -> h.getShipType().equals(ship.getType()))
+                .collect(Collectors.toSet());
 
-                Set<Hit> allHits = ship.getGamePlayer().getHits(ship.getGamePlayer().getOpponent().getSalvoes());
-                Set<Hit> specificHits = new HashSet<>();
+        ship.setHits(shipHits);
 
-                for (Hit nonSpecific: allHits) {
-                    
-                    if (nonSpecific.getShipType() == ship.getType()) {
-                        specificHits.add(nonSpecific);
-                    }
-                }
-
-                hitDtos = specificHits
-                        .stream()
-                        .map(hit -> makeHitDto(hit))
-                        .collect(toList());
-        }
+        hitDtos = ship.getHits()
+                .stream()
+                .map(hit -> makeHitDto(hit))
+                .collect(toList());
 
         ShipDto dto = new ShipDto();
         dto.setType(ship.getType());
         dto.setLocations(ship.getLocations());
         dto.setHits(hitDtos);
+        dto.setSunk(ship.checkIfShipIsSunk());
 
         return dto;
     }
@@ -440,9 +379,6 @@ public class SalvoController {
     }
 
     private HitDto makeHitDto(Hit hit) {
-
-        System.out.println("hit ship: " + hit.getShip());
-
 
         HitDto dto = new HitDto();
         dto.setLocation(hit.getLocation());

@@ -1,0 +1,41 @@
+@font-face {
+    font-family: 'good_times_rg';
+    src: url('good_times_rg-webfont.woff2') format('woff2'),
+         url('good_times_rg-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+h1 {
+    font-family: 'good_times_rg';
+    color:#EFEFEF;
+    padding-top: 35px;
+    }
+
+h5 {
+    font-family: 'good_times_rg';
+    color: #EFEFEF;
+    padding-top: 100px;
+    }
+
+h4 {
+    font-family: 'good_times_rg';
+    color: #EFEFEF;
+    padding-top: 100px;
+    }
+
+.btn {
+    font-family: 'good_times_rg';
+    background-color: #46BEB5 !important;
+    border-color: #46BEB5 !important;
+}
+
+.btn-primary:focus {
+    background-color: #46BEB5 !important;
+    border-color: #46BEB5 !important;
+}
+
+.logout-header {
+    display: flex;
+}

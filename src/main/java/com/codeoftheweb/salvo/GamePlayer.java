@@ -121,7 +121,6 @@ public class GamePlayer {
         List<String> salvoLocations = new ArrayList<String>();
 
         for (Salvo salvo: salvoes) {
-            System.out.println("salvo locations: " + salvo.getLocations());
             salvoLocations = salvo.getLocations();
         }
 
@@ -133,12 +132,9 @@ public class GamePlayer {
             for (String salvoLocation: salvoLocations) {
 
                 if (ship.getLocations().contains(salvoLocation)) {
-                    System.out.println("ship type hit: " + ship.getType());
-                    System.out.println("hit location: " + salvoLocation);
                     Hit hit = new Hit();
                     hit.setLocation(salvoLocation);
                     hit.setShipType(ship.getType());
-                    hit.setShip(ship);
                     hits.add(hit);
                 }
             }

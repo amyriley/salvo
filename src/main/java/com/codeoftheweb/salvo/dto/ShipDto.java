@@ -7,6 +7,15 @@ public class ShipDto {
     private String type;
     private List<String> locations;
     private List<HitDto> hits;
+    private boolean sunk;
+
+    public boolean isSunk() {
+        return sunk;
+    }
+
+    public void setSunk(boolean sunk) {
+        this.sunk = sunk;
+    }
 
     public List<HitDto> getHits() {
         return hits;

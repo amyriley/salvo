@@ -1,8 +1,11 @@
 package com.codeoftheweb.salvo;
 
 import org.hibernate.annotations.GenericGenerator;
-import javax.persistence.*;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Entity
 public class Hit {
@@ -12,12 +15,9 @@ public class Hit {
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
 
-    private String shipType;
-    private String location;
+    public String shipType;
+    public String location;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ship")
-    private Ship ship;
 
     public String getLocation() {
         return location;
@@ -25,22 +25,6 @@ public class Hit {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public Ship getShip() {
-        return ship;
-    }
-
-    public void setShip(Ship ship) {
-        this.ship = ship;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getShipType() {

@@ -1,92 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" src="styles.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <meta charset="UTF-8">
     <title>Salvo!</title>
 </head>
-<body>
+<body background="gradient_background.jpg">
     <div id="app">
-        <div class="container">
-            <div>
+        <div id="logout-header" class="container">
+            <div class="row">
+                <div class="col-sm-2">
+                    <div v-if="authenticated" class="text-white">
+                        <button v-on:click="postLogout" type="submit" class="btn btn-primary mt-2 ml-2">Logout</button>
+                        <p class="mt-2 ml-2">Hello, {{username}}!</p>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <h1>Battleships</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container col-md-4 col-md-offset-4">
+            <div class="row">
                 <div v-if="!authenticated">
-                    <h4 class="mt-3 mb-3">Login</h4>
-                <div id="login_form" class="mb-5">
-                    <div>
+                    <h5 class="mt-3 mb-5 text-center">Login</h5>
+                <div id="login_form" class="mb-5" style='width: 450px'>
+                <div>
                     <div class="form-group">
-                        <label for="email">Email address</label>
-                        <input v-model="username" name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+                        <label for="email" class="text-white">Email address</label>
+                        <input v-model="username" name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Email">
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password" class="text-white">Password</label>
                         <input v-model="password" name="password" type="password" class="form-control" id="password" placeholder="Password">
                     </div>
                 </div>
                 </div>
-                    <div v-if="authenticated">
-                        <p>Hello, {{username}}!</p>
-                    </div>
                 </div>
-                <button v-if="!authenticated" v-on:click="postLogin" type="submit" class="btn btn-primary">Login</button>
-                <button v-if="authenticated" v-on:click="postLogout" type="submit" class="btn btn-primary">Logout</button>
-                <button v-if="!authenticated" v-on:click="postSignup" type="submit" class="btn btn-primary">Signup</button>
+            </div>
+            <div class="row text-center justify-content-center">
+                <div>
+                    <button v-if="!authenticated" v-on:click="postLogin" type="submit" class="btn btn-primary mr-3">Login</button>
+                    <button v-if="!authenticated" v-on:click="postSignup" type="submit" class="btn btn-primary">Signup</button>
+                </div>
             </div>
         </div>
         <div v-if="authenticated" class="container">
-            <p>Hello, {{username}}!</p>
-            <h4>Leaderboard</h4>
-            <table id="leaderboard" class="table table-bordered" style="width: 550px">
-                <thead id="table-headers-leader">
-                        <tr>
-                            <th class="text-sm-center" v-for="name in leaderboard">{{name}}</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-rows-leaderboard">
-                        <tr v-for="player in uniquePlayers">
-                            <td class="text-sm-center" style='width: 50px'>{{player.player}}</td>
-                            <td class="text-sm-center" style='width: 50px'>{{player.total}}</td>
-                            <td class="text-sm-center" style='width: 50px'>{{player.wins}}</td>
-                            <td class="text-sm-center" style='width: 50px'>{{player.losses}}</td>
-                            <td class="text-sm-center" style='width: 50px'>{{player.ties}}</td>
-                        </tr>
-                    </tbody>
-            </table>
+            <div class="row">
+                <div class="col-sm-4">
+                        <h4 class="mt-2 mb-2">Games</h4>
+                        <table id="gamesTable" class="table table-bordered text-white">
+                            <tbody id="table-rows-leaderboard">
+                                <tr v-for="(game, index) in gamesList" :key="index">
+                                    <td class="text-sm-center">{{game.id}}</td>
+                                    <td class="text-sm-center">{{game.created}}</td>
+                                    <td v-for="gamePlayer in game.gamePlayerIds" class="text-sm-center">
+                                        <a v-if="gamePlayer.email.indexOf(username) > -1 && game.players.length >= 1" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
+                                        <a v-else>{{game.players}}</a>
+                                    </td>
+                                    <!-- <td v-for="gamePlayer in game.gamePlayers" class="text-sm-center" style='width: 50px'>
+                                        <a>{{gamePlayer.player}}</a>
+                                    </td> -->
+        
+                                    <!-- <td v-if="game.players.indexOf(username) > -1" class="text-sm-center" style='width: 50px'>
+                                        <a v-else>{{game.players}}</a>
+                                        <a v-for="gamePlayer in game.gamePlayerIds" :id="gamePlayer.id" :href="`/web/game.html?gp=${gamePlayer.id}`">{{gamePlayer.email}}</a>
+                                    </td> -->
+                                    <td>
+                                        <button :id="game.id" :value="game.id" v-on:click="joinGame(game.id)" type="submit" class="btn btn-primary">Join game</button>
+                                    </td>
+                                    
+                                    <!-- <td  class="text-sm-center" style='width: 50px'>
+                                        <a v-if="gamePlayer.email == username" :id="gamePlayer.id" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
+                                        <a v-else>{{game.players}}</a>
+                                    </td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button v-on:click="postGame()" type="submit" class="btn btn-primary">Create game</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-3">
+                    <h4 class="mt-2 mb-2 ml-5">Leaderboard</h4>
+                    <table id="leaderboard" class="table table-bordered text-white">
+                        <thead id="table-headers-leader">
+                            <tr>
+                                <th class="text-sm-center" v-for="name in leaderboard">{{name}}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-rows-leaderboard">
+                            <tr v-for="player in uniquePlayers">
+                                <td class="text-sm-center">{{player.player}}</td>
+                                <td class="text-sm-center">{{player.total}}</td>
+                                <td class="text-sm-center">{{player.wins}}</td>
+                                <td class="text-sm-center">{{player.losses}}</td>
+                                <td class="text-sm-center">{{player.ties}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div v-if="authenticated" class="container">
-                <h4>Games</h4>
-                <table id="gamesTable" class="table table-bordered" style="width: 550px">
-                    <tbody id="table-rows-leaderboard">
-                        <tr v-for="(game, index) in gamesList" :key="index">
-                            <td class="text-sm-center" style='width: 50px'>{{game.id}}</td>
-                            <td class="text-sm-center" style='width: 50px'>{{game.created}}</td>
-                            <td v-for="gamePlayer in game.gamePlayerIds" class="text-sm-center" style='width: 50px'>
-                                <a v-if="gamePlayer.email.indexOf(username) > -1 && game.players.length >= 1" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
-                                <a v-else>{{game.players}}</a>
-                            </td>
-                            <!-- <td v-for="gamePlayer in game.gamePlayers" class="text-sm-center" style='width: 50px'>
-                                <a>{{gamePlayer.player}}</a>
-                            </td> -->
-
-                            <!-- <td v-if="game.players.indexOf(username) > -1" class="text-sm-center" style='width: 50px'>
-                                <a v-else>{{game.players}}</a>
-                                <a v-for="gamePlayer in game.gamePlayerIds" :id="gamePlayer.id" :href="`/web/game.html?gp=${gamePlayer.id}`">{{gamePlayer.email}}</a>
-                            </td> -->
-                            <td>
-                                <button :id="game.id" :value="game.id" v-on:click="joinGame(game.id)" type="submit" class="btn btn-primary">Join game</button>
-                            </td>
-                            
-                            <!-- <td  class="text-sm-center" style='width: 50px'>
-                                <a v-if="gamePlayer.email == username" :id="gamePlayer.id" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
-                                <a v-else>{{game.players}}</a>
-                            </td> -->
-                        </tr>
-                    </tbody>
-                </table>
-                <button v-on:click="postGame()" type="submit" class="btn btn-primary">Create game</button>
-
-        </div>
-
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
