@@ -14,6 +14,8 @@ public class GamePlayer {
     private long id;
     private Date joinTime = new Date();
     private int turn;
+    private boolean firstPlayer;
+    private boolean turnToPlaceSalvoes;
 
     public int getTurn() {
         return turn;
@@ -90,6 +92,22 @@ public class GamePlayer {
 
     public void setSalvoes(Set<Salvo> salvoes) {
         this.salvoes = salvoes;
+    }
+
+    public boolean isFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public void setFirstPlayer(boolean firstPlayer) {
+        this.firstPlayer = firstPlayer;
+    }
+
+    public boolean isTurnToPlaceSalvoes() {
+        return turnToPlaceSalvoes;
+    }
+
+    public void setTurnToPlaceSalvoes(boolean turnToPlaceSalvoes) {
+        this.turnToPlaceSalvoes = turnToPlaceSalvoes;
     }
 
     public void addShip(Ship ship) {

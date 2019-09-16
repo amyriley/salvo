@@ -17,24 +17,12 @@ public class Ship {
     public Ship() {}
 
     @ElementCollection
-    @Column(name="hits")
-    private Set<Hit> hits = new HashSet<>();
-
-    @ElementCollection
     @Column(name="locations")
     private List<String> locations = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="game_player_id")
     private GamePlayer gamePlayer;
-
-    public Set<Hit> getHits() {
-        return hits;
-    }
-
-    public void setHits(Set<Hit> hits) {
-        this.hits = hits;
-    }
 
     public boolean isSunk() {
         return sunk;
@@ -82,20 +70,5 @@ public class Ship {
 
     public void setGamePlayer(GamePlayer gamePlayer) {
         this.gamePlayer = gamePlayer;
-    }
-
-    public void addHit(Hit hit) {
-        hits.add(hit);
-    }
-
-    public boolean checkIfShipIsSunk() {
-
-        if (this.getHits().size() != this.getLocations().size()) {
-            this.setSunk(false);
-        } else {
-            this.setSunk(true);
-        }
-
-        return this.isSunk();
     }
 }

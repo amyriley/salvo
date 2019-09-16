@@ -63,6 +63,12 @@ public class SalvoController {
         GameDto dto = new GameDto();
         GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
 
+        if (gamePlayer.getGame().getGamePlayers().size() == 1) {
+            gamePlayer.setFirstPlayer(true);
+            gamePlayerRepository.save(gamePlayer);
+        }
+
+        // TODO split out?
         List<GamePlayerDto> gamePlayerDtos = gamePlayer.getGame().getGamePlayers()
                 .stream()
                 .map(player -> makeGamePlayerDto(player))
@@ -83,6 +89,7 @@ public class SalvoController {
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
         dto.setScores(scoreDtos);
+        dto.setTurn(gamePlayer.getGame().getTurn());
 
         return dto;
     }
@@ -168,7 +175,7 @@ public class SalvoController {
     }
 
     @RequestMapping(value = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> shipLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Ship> ships) {
+    public ResponseEntity<GameDto> shipLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Ship> ships) {
 
         Player currentUser = playerRepository.findByUsername(authentication.getName());
 
@@ -200,11 +207,27 @@ public class SalvoController {
 
         gamePlayerRepository.save(gamePlayer);
 
-        return new ResponseEntity<>("Ships added", HttpStatus.CREATED);
+        Game currentGame = gamePlayer.getGame();
+
+        if (gamePlayer.getShips().size() == 5 && gamePlayer.getOpponent().getShips().size() == 5) {
+            long currentTurn = currentGame.getTurn();
+            long updatedTurn = currentTurn + 1;
+            currentGame.setTurn(updatedTurn);
+            gameRepository.save(currentGame);
+
+            gamePlayer.setTurnToPlaceSalvoes(true);
+            gamePlayer.getOpponent().setTurnToPlaceSalvoes(false);
+            gamePlayerRepository.save(gamePlayer);
+            gamePlayerRepository.save(gamePlayer.getOpponent());
+        }
+
+        GameDto updatedGameDto = getOneGame(gamePlayer.getId());
+
+        return new ResponseEntity<>(updatedGameDto, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> salvoLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Salvo> salvoes) {
+    public ResponseEntity<GameDto> salvoLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Salvo> salvoes) {
 
         Player currentUser = playerRepository.findByUsername(authentication.getName());
 
@@ -234,7 +257,22 @@ public class SalvoController {
 
         gamePlayerRepository.save(gamePlayer);
 
-        return new ResponseEntity<>("Salvoes added", HttpStatus.CREATED);
+        Game currentGame = gamePlayer.getGame();
+        long currentTurn = currentGame.getTurn();
+        long updatedTurn = currentTurn + 1;
+        currentGame.setTurn(updatedTurn);
+
+        gameRepository.save(currentGame);
+
+        gamePlayer.setTurnToPlaceSalvoes(false);
+        gamePlayer.getOpponent().setTurnToPlaceSalvoes(true);
+
+        gamePlayerRepository.save(gamePlayer);
+        gamePlayerRepository.save(gamePlayer.getOpponent());
+
+        GameDto updatedGameDto = getOneGame(gamePlayer.getId());
+
+        return new ResponseEntity<>(updatedGameDto, HttpStatus.CREATED);
     }
 
     private List<GameDto> getAllGames() {
@@ -280,6 +318,8 @@ public class SalvoController {
         dto.setId(gamePlayer.getId());
         dto.setPlayer(makePlayerDto(gamePlayer.getPlayer()));
         dto.setSalvoes(salvoDtos);
+        dto.setFirstPlayer(gamePlayer.isFirstPlayer());
+        dto.setTurnToPlaceSalvoes(gamePlayer.isTurnToPlaceSalvoes());
 
         return dto;
     }
@@ -312,6 +352,7 @@ public class SalvoController {
         dto.setCreated(game.getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setScores(scoreDtos);
+        dto.setTurn(game.getTurn());
 
         return dto;
     }
@@ -339,12 +380,12 @@ public class SalvoController {
         Set<Hit> hits = ship.getGamePlayer().getHits(ship.getGamePlayer().getOpponent().getSalvoes());
 
         Set<Hit> shipHits = hits.stream()
-                .filter(h -> h.getShipType().equals(ship.getType()))
+                .filter(hit -> hit.getShipType().equals(ship.getType()))
                 .collect(Collectors.toSet());
 
-        ship.setHits(shipHits);
+        boolean isSunk = shipHits.size() >= ship.getLocations().size();
 
-        hitDtos = ship.getHits()
+        hitDtos = shipHits
                 .stream()
                 .map(hit -> makeHitDto(hit))
                 .collect(toList());
@@ -353,7 +394,7 @@ public class SalvoController {
         dto.setType(ship.getType());
         dto.setLocations(ship.getLocations());
         dto.setHits(hitDtos);
-        dto.setSunk(ship.checkIfShipIsSunk());
+        dto.setSunk(isSunk);
 
         return dto;
     }

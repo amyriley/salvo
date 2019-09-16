@@ -6,6 +6,10 @@ public class GamePlayerDto {
 
     private long id;
 
+    private boolean firstPlayer;
+
+    private boolean turnToPlaceSalvoes;
+
     private List<SalvoDto> salvoDtos;
 
     public List<SalvoDto> getSalvoes() {
@@ -34,4 +38,19 @@ public class GamePlayerDto {
         this.id = id;
     }
 
+    public boolean isFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public void setFirstPlayer(boolean firstPlayer) {
+        this.firstPlayer = firstPlayer;
+    }
+
+    public boolean isTurnToPlaceSalvoes() {
+        return turnToPlaceSalvoes;
+    }
+
+    public void setTurnToPlaceSalvoes(boolean turnToPlaceSalvoes) {
+        this.turnToPlaceSalvoes = turnToPlaceSalvoes;
+    }
 }

@@ -11,7 +11,9 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private long id;
+
     private Date creationTime = new Date();
+    private long turn = 0;
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
     private Set<GamePlayer> gamePlayers;
@@ -56,5 +58,13 @@ public class Game {
 
     public void setScores(Set<Score> scores) {
         this.scores = scores;
+    }
+
+    public long getTurn() {
+        return turn;
+    }
+
+    public void setTurn(long turn) {
+        this.turn = turn;
     }
 }
