@@ -10,6 +10,11 @@
     <div id="app">
         <button v-on:click="postLogout" type="submit" class="btn btn-primary">Logout</button>
         <div class="container">
+            <div>
+                <p v-if="shipsPlaced == false">Place your ships!</p>
+                <p v-if="turnToPlaceSalvoes == true">It's your turn to fire a salvo!</p>
+                <p v-else>It's not your turn to fire a salvo...</p>
+            </div>
             <div class="row">
                 <div class="col-sm">
                     <h4 id="gamePlayerHeader">Game Player X</h4>
@@ -26,7 +31,7 @@
                         </tbody>
                     </table>  
                 </div>
-                <div class="col-sm">
+                <div v-if="shipsPlaced == false" class="col-sm">
                     <h4>Place your ships</h4>
                     <table id="shipTable" class="table table-bordered text-sm-center">
                         <thead id="table-headers-ships">

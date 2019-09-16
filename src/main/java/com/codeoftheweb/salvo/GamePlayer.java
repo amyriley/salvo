@@ -153,6 +153,7 @@ public class GamePlayer {
                     Hit hit = new Hit();
                     hit.setLocation(salvoLocation);
                     hit.setShipType(ship.getType());
+                    hit.setTurn(ship.getGamePlayer().getGame().getTurn() - 1);
                     hits.add(hit);
                 }
             }

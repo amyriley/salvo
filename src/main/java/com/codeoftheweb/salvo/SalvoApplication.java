@@ -52,53 +52,17 @@ public class SalvoApplication {
 
 			Player jBauer = new Player("j.bauer@ctu.gov", passwordEncoder.encode("24"));
 			Player cObrian = new Player("c.obrian@ctu.gov", passwordEncoder.encode("42"));
-			Player kBauer = new Player("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
-			Player tAlmeida = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
-			Player dPalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder.encode("eagle"));
-
 			playerRepository.save(jBauer);
 			playerRepository.save(cObrian);
-			playerRepository.save(kBauer);
-			playerRepository.save(tAlmeida);
-			playerRepository.save(dPalmer);
 
 			Game game1 = new Game();
-			Game game2 = new Game();
-			Game game3 = new Game();
-			Game game4 = new Game();
-			Game game5 = new Game();
-
-			Date creationDate = new Date();
-			game2.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(3600)));
-			game3.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(7200)));
-
 			gameRepository.save(game1);
-			gameRepository.save(game2);
-			gameRepository.save(game3);
-			gameRepository.save(game4);
-			gameRepository.save(game5);
 
 			GamePlayer g1 = new GamePlayer(jBauer, game1);
 			GamePlayer g2 = new GamePlayer(cObrian, game1);
-			GamePlayer g3 = new GamePlayer(kBauer, game2);
-			GamePlayer g4 = new GamePlayer(tAlmeida, game2);
-			GamePlayer g5 = new GamePlayer(jBauer, game3);
-			GamePlayer g6 = new GamePlayer(kBauer, game3);
-			GamePlayer g7 = new GamePlayer(dPalmer, game4);
-
 			gamePlayerRepository.save(g1);
 			gamePlayerRepository.save(g2);
-			gamePlayerRepository.save(g3);
-			gamePlayerRepository.save(g4);
-			gamePlayerRepository.save(g5);
-			gamePlayerRepository.save(g6);
-			gamePlayerRepository.save(g7);
-
 			gameRepository.save(game1);
-			gameRepository.save(game2);
-			gameRepository.save(game3);
-			gameRepository.save(game4);
-			gameRepository.save(game5);
 
 			Ship ship1 = new Ship("carrier");
 			Ship ship2 = new Ship("battleship");
@@ -123,27 +87,41 @@ public class SalvoApplication {
 			shipRepository.save(ship9);
 			shipRepository.save(ship10);
 
-			g3.addShip(ship5);
-			g3.addShip(ship3);
-
-			g1.addShip(ship4);
+			g1.addShip(ship1);
+			g1.addShip(ship2);
 			g1.addShip(ship3);
+			g1.addShip(ship4);
 			g1.addShip(ship5);
 
+			g2.addShip(ship6);
+			g2.addShip(ship7);
+			g2.addShip(ship8);
 			g2.addShip(ship9);
 			g2.addShip(ship10);
 
-			List<String> destroyerLocationsJack = new ArrayList<>(Arrays.asList("H2", "H3", "H4"));
-			ship4.setLocations(destroyerLocationsJack);
+			List<String> carrierLocationsJack = new ArrayList<>(Arrays.asList("A1", "B1", "C1"));
+			ship1.setLocations(carrierLocationsJack);
+
+			List<String> battleshipLocationsJack = new ArrayList<>();
+			ship2.setLocations(battleshipLocationsJack);
 
 			List<String> submarineLocationsJack = new ArrayList<>(Arrays.asList("E1", "F1", "G1"));
 			ship3.setLocations(submarineLocationsJack);
 
+			List<String> destroyerLocationsJack = new ArrayList<>(Arrays.asList("H2", "H3", "H4"));
+			ship4.setLocations(destroyerLocationsJack);
+
 			List<String> patrolBoatLocationsJack = new ArrayList<>(Arrays.asList("B4", "B5"));
 			ship5.setLocations(patrolBoatLocationsJack);
 
-			List<String> carrierLocations = new ArrayList<>(Arrays.asList("A1", "B1", "C1"));
-			ship1.setLocations(carrierLocations);
+			List<String> carrierLocationsChloe = new ArrayList<>();
+			ship6.setLocations(carrierLocationsChloe);
+
+			List<String> battleshipLocationsChloe = new ArrayList<>();
+			ship7.setLocations(battleshipLocationsChloe);
+
+			List<String> submarineLocationsChloe = new ArrayList<>();
+			ship8.setLocations(submarineLocationsChloe);
 
 			List<String> destroyerLocationsChloe = new ArrayList<>(Arrays.asList("B5", "C5", "D5"));
 			ship9.setLocations(destroyerLocationsChloe);
@@ -151,14 +129,61 @@ public class SalvoApplication {
 			List<String> patrolBoatLocationsChloe = new ArrayList<>(Arrays.asList("F1", "F2"));
 			ship10.setLocations(patrolBoatLocationsChloe);
 
+
+//			Player kBauer = new Player("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
+//			Player tAlmeida = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
+//			Player dPalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder.encode("eagle"));
+
+
+//			playerRepository.save(kBauer);
+//			playerRepository.save(tAlmeida);
+//			playerRepository.save(dPalmer);
+
+//			Game game2 = new Game();
+//			Game game3 = new Game();
+//			Game game4 = new Game();
+//			Game game5 = new Game();
+
+			Date creationDate = new Date();
+//			game2.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(3600)));
+//			game3.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(7200)));
+
+//			gameRepository.save(game2);
+//			gameRepository.save(game3);
+//			gameRepository.save(game4);
+//			gameRepository.save(game5);
+
+//			GamePlayer g3 = new GamePlayer(kBauer, game2);
+//			GamePlayer g4 = new GamePlayer(tAlmeida, game2);
+//			GamePlayer g5 = new GamePlayer(jBauer, game3);
+//			GamePlayer g6 = new GamePlayer(kBauer, game3);
+//			GamePlayer g7 = new GamePlayer(dPalmer, game4);
+
+//			gamePlayerRepository.save(g3);
+//			gamePlayerRepository.save(g4);
+//			gamePlayerRepository.save(g5);
+//			gamePlayerRepository.save(g6);
+//			gamePlayerRepository.save(g7);
+
+//			gameRepository.save(game2);
+//			gameRepository.save(game3);
+//			gameRepository.save(game4);
+//			gameRepository.save(game5);
+
+
+//			g3.addShip(ship5);
+//			g3.addShip(ship3);
+
+
+
 			shipRepository.save(ship5);
 			shipRepository.save(ship4);
 			shipRepository.save(ship3);
 			shipRepository.save(ship1);
 			shipRepository.save(ship9);
 			shipRepository.save(ship10);
-			gamePlayerRepository.save(g3);
-			gamePlayerRepository.save(g7);
+//			gamePlayerRepository.save(g3);
+//			gamePlayerRepository.save(g7);
 
 			Salvo salvo1Jack = new Salvo();
 			Salvo salvo2Jack = new Salvo();
@@ -215,28 +240,28 @@ public class SalvoApplication {
 			Score score5 = new Score(1);
 			Score score6 = new Score(1);
 
-			score3.setGame(game2);
-			score4.setGame(game2);
-			score3.setPlayer(tAlmeida);
-			score4.setPlayer(kBauer);
+//			score3.setGame(game2);
+//			score4.setGame(game2);
+//			score3.setPlayer(tAlmeida);
+//			score4.setPlayer(kBauer);
 
-			score5.setGame(game3);
-			score6.setGame(game3);
-			score5.setPlayer(jBauer);
-			score6.setPlayer(kBauer);
+//			score5.setGame(game3);
+//			score6.setGame(game3);
+//			score5.setPlayer(jBauer);
+//			score6.setPlayer(kBauer);
 
 			scoreRepository.save(score3);
 			scoreRepository.save(score4);
 			scoreRepository.save(score5);
 			scoreRepository.save(score6);
 
-			playerRepository.save(tAlmeida);
-			playerRepository.save(kBauer);
-			playerRepository.save(jBauer);
+//			playerRepository.save(tAlmeida);
+//			playerRepository.save(kBauer);
+//			playerRepository.save(jBauer);
 
 			gameRepository.save(game1);
-			gameRepository.save(game2);
-			gameRepository.save(game3);
+//			gameRepository.save(game2);
+//			gameRepository.save(game3);
 		};
 
 	}

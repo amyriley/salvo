@@ -161,19 +161,9 @@ var app = new Vue({
                 }
             ]
         },
-        gameStats: []
-        // gameStats: [
-        //     {
-        //         hitsOnYou: {
-
-        //         }
-        //     }, 
-        //     {
-        //         hitsOnOpponent: {
-
-        //         }
-        //     }
-        // ]      
+        gameStats: [],
+        turnToPlaceSalvoes: false,
+        shipsPlaced: false  
     },
     methods: {
         gameView: function() {
@@ -222,7 +212,6 @@ var app = new Vue({
             return hitsOnOpponent;
         },
         fetchData: function() {
-
             this.gamePlayerId = this.getParameterByName("gp");
 
             if (document.title === "Ship Locations!") {
@@ -243,6 +232,9 @@ var app = new Vue({
                         this.getSalvoesFiredByOpponent(data);
                         this.setHitPositions(data);
                         this.changeGamePlayerHeader(data);
+                        console.log(this.getTurnToPlaceSalvoes(data, this.gamePlayerId));
+                        this.turnToPlaceSalvoes = this.getTurnToPlaceSalvoes(data, this.gamePlayerId);
+                        setTimeout(this.fetchData, 5000);
                     })
                     .catch(error => {
                         console.log(error);
@@ -370,6 +362,19 @@ var app = new Vue({
             })
             .catch(error => console.log(error))
         },
+        getTurnToPlaceSalvoes: function(data, gamePlayerId) {
+            var gamePlayers = data.gamePlayers;
+            var turnToPlaceSalvoes;
+
+            for (var i = 0; i < gamePlayers.length; i++) {
+                if (gamePlayers[i].id == gamePlayerId) {
+                    console.log("turnToPlaceSalvoes" + gamePlayers[i].turnToPlaceSalvoes);
+                    turnToPlaceSalvoes = gamePlayers[i].turnToPlaceSalvoes;
+                }
+            }
+
+            return turnToPlaceSalvoes;
+        },
         selectShip: function() {
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
             var shipType = document.querySelector('input[name="ship_selector"]:checked').id;
@@ -390,9 +395,12 @@ var app = new Vue({
 
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].positions.length == 0) {
+                    this.shipsPlaced = false;
                     return false;
                 }
             }
+
+            this.shipsPlaced = true;
 
             return true;
         },
@@ -646,7 +654,7 @@ var app = new Vue({
             var coordinate = this.getCoordinate(id);
             var element = this.getElement(id);
 
-            if (this.canPlaceSalvo(coordinate) && this.salvo.locations.length < 5) {
+            if (this.canPlaceSalvo(coordinate)) {
                 this.setSalvoPosition(coordinate, element);
             } else if (!this.canPlaceSalvo(coordinate)) {
                 this.removeSalvoPosition(coordinate, element);

@@ -117,7 +117,6 @@ public class SalvoController {
         Map<String, Object> gamePlayerIds = new HashMap<>();
 
         gamePlayerIds.put("gpid", gamePlayer1.getId());
-        System.out.println("gpid" + gamePlayerIds);
 
         GamePlayerDto dto = makeGamePlayerDto(gamePlayer1);
 
@@ -202,23 +201,15 @@ public class SalvoController {
             System.out.println(ship.getLocations());
             shipRepository.save(ship);
             gamePlayer.addShip(ship);
-
         }
 
         gamePlayerRepository.save(gamePlayer);
 
         Game currentGame = gamePlayer.getGame();
 
-        if (gamePlayer.getShips().size() == 5 && gamePlayer.getOpponent().getShips().size() == 5) {
-            long currentTurn = currentGame.getTurn();
-            long updatedTurn = currentTurn + 1;
-            currentGame.setTurn(updatedTurn);
-            gameRepository.save(currentGame);
-
+        if (gamePlayer.getShips().size() == 5) {
             gamePlayer.setTurnToPlaceSalvoes(true);
-            gamePlayer.getOpponent().setTurnToPlaceSalvoes(false);
             gamePlayerRepository.save(gamePlayer);
-            gamePlayerRepository.save(gamePlayer.getOpponent());
         }
 
         GameDto updatedGameDto = getOneGame(gamePlayer.getId());
@@ -245,9 +236,9 @@ public class SalvoController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        if (gamePlayer.getSalvoes().size() > 0) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+//        if (gamePlayer.getSalvoes().size() > 0) {
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
 
         for (Salvo salvo: salvoes) {
             System.out.println(salvo.getLocations());
@@ -424,6 +415,7 @@ public class SalvoController {
         HitDto dto = new HitDto();
         dto.setLocation(hit.getLocation());
         dto.setShipType(hit.getShipType());
+        dto.setTurn(hit.getTurn());
 
         return dto;
     }
