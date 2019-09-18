@@ -93,16 +93,32 @@ public class SalvoApplication {
 			g1.addShip(ship4);
 			g1.addShip(ship5);
 
+			shipRepository.save(ship1);
+			shipRepository.save(ship2);
+			shipRepository.save(ship3);
+			shipRepository.save(ship4);
+			shipRepository.save(ship5);
+
+			gamePlayerRepository.save(g1);
+
 			g2.addShip(ship6);
 			g2.addShip(ship7);
 			g2.addShip(ship8);
 			g2.addShip(ship9);
 			g2.addShip(ship10);
 
-			List<String> carrierLocationsJack = new ArrayList<>(Arrays.asList("A1", "B1", "C1"));
+			shipRepository.save(ship6);
+			shipRepository.save(ship7);
+			shipRepository.save(ship8);
+			shipRepository.save(ship9);
+			shipRepository.save(ship10);
+
+			gamePlayerRepository.save(g2);
+
+			List<String> carrierLocationsJack = new ArrayList<>(Arrays.asList("A1", "B1", "C1", "D1", "E1"));
 			ship1.setLocations(carrierLocationsJack);
 
-			List<String> battleshipLocationsJack = new ArrayList<>();
+			List<String> battleshipLocationsJack = new ArrayList<>(Arrays.asList("C1", "C2", "C4", "C5"));
 			ship2.setLocations(battleshipLocationsJack);
 
 			List<String> submarineLocationsJack = new ArrayList<>(Arrays.asList("E1", "F1", "G1"));
@@ -114,13 +130,13 @@ public class SalvoApplication {
 			List<String> patrolBoatLocationsJack = new ArrayList<>(Arrays.asList("B4", "B5"));
 			ship5.setLocations(patrolBoatLocationsJack);
 
-			List<String> carrierLocationsChloe = new ArrayList<>();
+			List<String> carrierLocationsChloe = new ArrayList<>(Arrays.asList("J1", "J2", "J3", "J4", "J5"));
 			ship6.setLocations(carrierLocationsChloe);
 
-			List<String> battleshipLocationsChloe = new ArrayList<>();
+			List<String> battleshipLocationsChloe = new ArrayList<>(Arrays.asList("A10", "B10", "C10", "D10"));
 			ship7.setLocations(battleshipLocationsChloe);
 
-			List<String> submarineLocationsChloe = new ArrayList<>();
+			List<String> submarineLocationsChloe = new ArrayList<>(Arrays.asList("F8", "F9", "F10"));
 			ship8.setLocations(submarineLocationsChloe);
 
 			List<String> destroyerLocationsChloe = new ArrayList<>(Arrays.asList("B5", "C5", "D5"));
@@ -129,52 +145,59 @@ public class SalvoApplication {
 			List<String> patrolBoatLocationsChloe = new ArrayList<>(Arrays.asList("F1", "F2"));
 			ship10.setLocations(patrolBoatLocationsChloe);
 
+			shipRepository.save(ship1);
+			shipRepository.save(ship2);
+			shipRepository.save(ship3);
+			shipRepository.save(ship4);
+			shipRepository.save(ship5);
+			shipRepository.save(ship6);
+			shipRepository.save(ship7);
+			shipRepository.save(ship8);
+			shipRepository.save(ship9);
+			shipRepository.save(ship10);
 
-//			Player kBauer = new Player("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
-//			Player tAlmeida = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
-//			Player dPalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder.encode("eagle"));
+			Player kBauer = new Player("kim_bauer@gmail.com", passwordEncoder.encode("kb"));
+			Player tAlmeida = new Player("t.almeida@ctu.gov", passwordEncoder.encode("mole"));
+			Player dPalmer = new Player("d.palmer@whitehouse.gov", passwordEncoder.encode("eagle"));
 
+			playerRepository.save(kBauer);
+			playerRepository.save(tAlmeida);
+			playerRepository.save(dPalmer);
 
-//			playerRepository.save(kBauer);
-//			playerRepository.save(tAlmeida);
-//			playerRepository.save(dPalmer);
-
-//			Game game2 = new Game();
-//			Game game3 = new Game();
-//			Game game4 = new Game();
-//			Game game5 = new Game();
+			Game game2 = new Game();
+			Game game3 = new Game();
+			Game game4 = new Game();
+			Game game5 = new Game();
 
 			Date creationDate = new Date();
-//			game2.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(3600)));
-//			game3.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(7200)));
+			game2.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(3600)));
+			game3.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(7200)));
 
-//			gameRepository.save(game2);
-//			gameRepository.save(game3);
-//			gameRepository.save(game4);
-//			gameRepository.save(game5);
+			gameRepository.save(game2);
+			gameRepository.save(game3);
+			gameRepository.save(game4);
+			gameRepository.save(game5);
 
-//			GamePlayer g3 = new GamePlayer(kBauer, game2);
-//			GamePlayer g4 = new GamePlayer(tAlmeida, game2);
-//			GamePlayer g5 = new GamePlayer(jBauer, game3);
-//			GamePlayer g6 = new GamePlayer(kBauer, game3);
-//			GamePlayer g7 = new GamePlayer(dPalmer, game4);
+			GamePlayer g3 = new GamePlayer(kBauer, game2);
+			GamePlayer g4 = new GamePlayer(tAlmeida, game2);
+			GamePlayer g5 = new GamePlayer(jBauer, game3);
+			GamePlayer g6 = new GamePlayer(kBauer, game3);
+			GamePlayer g7 = new GamePlayer(dPalmer, game4);
 
-//			gamePlayerRepository.save(g3);
-//			gamePlayerRepository.save(g4);
-//			gamePlayerRepository.save(g5);
-//			gamePlayerRepository.save(g6);
-//			gamePlayerRepository.save(g7);
+			gamePlayerRepository.save(g3);
+			gamePlayerRepository.save(g4);
+			gamePlayerRepository.save(g5);
+			gamePlayerRepository.save(g6);
+			gamePlayerRepository.save(g7);
 
-//			gameRepository.save(game2);
-//			gameRepository.save(game3);
-//			gameRepository.save(game4);
-//			gameRepository.save(game5);
+			gameRepository.save(game2);
+			gameRepository.save(game3);
+			gameRepository.save(game4);
+			gameRepository.save(game5);
 
 
 //			g3.addShip(ship5);
 //			g3.addShip(ship3);
-
-
 
 			shipRepository.save(ship5);
 			shipRepository.save(ship4);
@@ -182,17 +205,17 @@ public class SalvoApplication {
 			shipRepository.save(ship1);
 			shipRepository.save(ship9);
 			shipRepository.save(ship10);
-//			gamePlayerRepository.save(g3);
-//			gamePlayerRepository.save(g7);
+			gamePlayerRepository.save(g3);
+			gamePlayerRepository.save(g7);
 
 			Salvo salvo1Jack = new Salvo();
 			Salvo salvo2Jack = new Salvo();
 
-			List<String> salvo1JackLocations = new ArrayList<>(Arrays.asList("B5", "C5", "F1"));
+			List<String> salvo1JackLocations = new ArrayList<>(Arrays.asList("A10", "B10", "C10", "D10", "E10"));
 			salvo1Jack.setLocations(salvo1JackLocations);
 			salvoRepository.save(salvo1Jack);
 
-			List<String> salvo2JackLocations = new ArrayList<>(Arrays.asList("F2", "D5"));
+			List<String> salvo2JackLocations = new ArrayList<>(Arrays.asList("J1", "J2", "J3", "J4", "J5"));
 			salvo2Jack.setLocations(salvo2JackLocations);
 			salvoRepository.save(salvo2Jack);
 
@@ -200,24 +223,32 @@ public class SalvoApplication {
 			g1.addSalvo(salvo2Jack);
 			gamePlayerRepository.save(g1);
 			salvoRepository.save(salvo1Jack);
-//			SalvoRepository.save(salvo2Jack);
+			salvoRepository.save(salvo2Jack);
 
 			Salvo salvo1Chloe = new Salvo();
 			Salvo salvo2Chloe = new Salvo();
+			Salvo salvo3Chloe = new Salvo();
 
-			List<String> salvo1ChloeLocations = new ArrayList<>(Arrays.asList("B4", "B5", "B6"));
+			List<String> salvo1ChloeLocations = new ArrayList<>(Arrays.asList("A1", "A2", "A3", "A4", "A5"));
 			salvo1Chloe.setLocations(salvo1ChloeLocations);
 			salvoRepository.save(salvo1Chloe);
 
-			List<String> salvo2ChloeLocations = new ArrayList<>(Arrays.asList("E1", "H3", "A2"));
+			List<String> salvo2ChloeLocations = new ArrayList<>(Arrays.asList("C1", "C2", "C3", "C4", "C5"));
 			salvo2Chloe.setLocations(salvo2ChloeLocations);
 			salvoRepository.save(salvo2Chloe);
 
+			List<String> salvo3ChloeLocations = new ArrayList<>(Arrays.asList("H2", "H3", "H4"));
+			salvo3Chloe.setLocations(salvo3ChloeLocations);
+			salvoRepository.save(salvo3Chloe);
+
+
 			g2.addSalvo(salvo1Chloe);
 			g2.addSalvo(salvo2Chloe);
+			g2.addSalvo(salvo3Chloe);
 			gamePlayerRepository.save(g2);
 			salvoRepository.save(salvo1Chloe);
-//			SalvoRepository.save(salvo2Chloe);
+			salvoRepository.save(salvo2Chloe);
+			salvoRepository.save(salvo3Chloe);
 
 			Score score1 = new Score(0);
 			score1.setGame(game1);
@@ -240,28 +271,28 @@ public class SalvoApplication {
 			Score score5 = new Score(1);
 			Score score6 = new Score(1);
 
-//			score3.setGame(game2);
-//			score4.setGame(game2);
-//			score3.setPlayer(tAlmeida);
-//			score4.setPlayer(kBauer);
+			score3.setGame(game2);
+			score4.setGame(game2);
+			score3.setPlayer(tAlmeida);
+			score4.setPlayer(kBauer);
 
-//			score5.setGame(game3);
-//			score6.setGame(game3);
-//			score5.setPlayer(jBauer);
-//			score6.setPlayer(kBauer);
+			score5.setGame(game3);
+			score6.setGame(game3);
+			score5.setPlayer(jBauer);
+			score6.setPlayer(kBauer);
 
 			scoreRepository.save(score3);
 			scoreRepository.save(score4);
 			scoreRepository.save(score5);
 			scoreRepository.save(score6);
 
-//			playerRepository.save(tAlmeida);
-//			playerRepository.save(kBauer);
-//			playerRepository.save(jBauer);
+			playerRepository.save(tAlmeida);
+			playerRepository.save(kBauer);
+			playerRepository.save(jBauer);
 
 			gameRepository.save(game1);
-//			gameRepository.save(game2);
-//			gameRepository.save(game3);
+			gameRepository.save(game2);
+			gameRepository.save(game3);
 		};
 
 	}

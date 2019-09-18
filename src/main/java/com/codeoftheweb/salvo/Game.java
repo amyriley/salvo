@@ -13,7 +13,7 @@ public class Game {
     private long id;
 
     private Date creationTime = new Date();
-    private long turn = 0;
+    private long turn;
 
     @OneToMany(mappedBy="game", fetch=FetchType.EAGER)
     private Set<GamePlayer> gamePlayers;

@@ -16,14 +16,7 @@ public class GamePlayer {
     private int turn;
     private boolean firstPlayer;
     private boolean turnToPlaceSalvoes;
-
-    public int getTurn() {
-        return turn;
-    }
-
-    public void setTurn(int turn) {
-        this.turn = turn;
-    }
+    private int remainingShips;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "player_id")
@@ -44,6 +37,14 @@ public class GamePlayer {
     public GamePlayer(Player player, Game game) {
         this.player = player;
         this.game = game;
+    }
+
+    public int getRemainingShips() {
+        return remainingShips;
+    }
+
+    public void setRemainingShips(int remainingShips) {
+        this.remainingShips = remainingShips;
     }
 
     public Date getJoinTime() {
@@ -102,6 +103,14 @@ public class GamePlayer {
         this.firstPlayer = firstPlayer;
     }
 
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
     public boolean isTurnToPlaceSalvoes() {
         return turnToPlaceSalvoes;
     }
@@ -135,11 +144,10 @@ public class GamePlayer {
     }
 
     public Set<Hit> getHits(Set<Salvo> salvoes) {
-
         List<String> salvoLocations = new ArrayList<String>();
 
         for (Salvo salvo: salvoes) {
-            salvoLocations = salvo.getLocations();
+            salvo.getLocations().forEach(location -> salvoLocations.add(location));
         }
 
         Set<Hit> hits = new HashSet<>();
@@ -153,7 +161,7 @@ public class GamePlayer {
                     Hit hit = new Hit();
                     hit.setLocation(salvoLocation);
                     hit.setShipType(ship.getType());
-                    hit.setTurn(ship.getGamePlayer().getGame().getTurn() - 1);
+                    hit.setTurn(ship.getGamePlayer().getOpponent().getTurn());
                     hits.add(hit);
                 }
             }

@@ -14,6 +14,7 @@ public class Ship {
 
     private String type;
     private boolean sunk;
+
     public Ship() {}
 
     @ElementCollection

@@ -12,8 +12,8 @@
         <div class="container">
             <div>
                 <p v-if="shipsPlaced == false">Place your ships!</p>
-                <p v-if="turnToPlaceSalvoes == true">It's your turn to fire a salvo!</p>
-                <p v-else>It's not your turn to fire a salvo...</p>
+                <p v-if="turnToPlaceSalvoes == true && shipsPlaced == true">It's your turn to fire a salvo!</p>
+                <p v-if="turnToPlaceSalvoes == false && shipsPlaced == true">It's not your turn to fire a salvo...</p>
             </div>
             <div class="row">
                 <div class="col-sm">
@@ -56,9 +56,9 @@
                 </div>
             </div>
             <div>
-                <button :id="confirm-ships" v-on:click="shipLocations" type="submit" class="btn btn-primary">Confirm ships</button>
+                <button v-if="shipsPlaced == false" :id="confirm-ships" v-on:click="shipLocations" type="submit" class="btn btn-primary">Confirm ships</button>
             </div>
-            <div class="row">
+            <div class="row" v-if="shipsPlaced == true">
                 <div class="col-sm">
                     <h4>Salvoes fired by you...</h4>
                     <table id="salvoTable" class="table table-bordered" style="width: 500px">
@@ -74,7 +74,7 @@
                             </tbody>
                     </table>
                 </div>
-                <div>
+                <div v-if="turnToPlaceSalvoes == true">
                     <button :id="confirm-salvo" v-on:click="sendSalvoLocations" type="submit" class="btn btn-primary">Confirm salvo</button>
                 </div>
             </div>

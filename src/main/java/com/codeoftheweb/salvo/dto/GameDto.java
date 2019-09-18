@@ -10,16 +10,6 @@ public class GameDto {
     private List<GamePlayerDto> gamePlayers;
     private List<ShipDto> ships;
     private List<ScoreDto> scores;
-    private long turn;
-    private List<TurnDto> turns;
-
-    public List<TurnDto> getTurns() {
-        return turns;
-    }
-
-    public void setTurns(List<TurnDto> turns) {
-        this.turns = turns;
-    }
 
     public List<ShipDto> getShips() {
         return ships;
@@ -59,13 +49,5 @@ public class GameDto {
 
     public void setScores(List<ScoreDto> scores) {
         this.scores = scores;
-    }
-
-    public long getTurn() {
-        return turn;
-    }
-
-    public void setTurn(long turn) {
-        this.turn = turn;
     }
 }

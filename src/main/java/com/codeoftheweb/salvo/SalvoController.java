@@ -84,12 +84,23 @@ public class SalvoController {
                 .map(score -> makeScoreDto(score))
                 .collect(toList());
 
+
+        List<Boolean> remainingShips = new ArrayList<>();
+
+        for (ShipDto ship: shipDtos) {
+            if (!ship.isSunk()) {
+                remainingShips.add(ship.isSunk());
+            }
+        }
+
+        gamePlayer.setRemainingShips(remainingShips.size());
+        gamePlayerRepository.save(gamePlayer);
+
         dto.setId(gamePlayer.getGame().getId());
         dto.setCreated(gamePlayer.getGame().getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
         dto.setScores(scoreDtos);
-        dto.setTurn(gamePlayer.getGame().getTurn());
 
         return dto;
     }
@@ -205,8 +216,6 @@ public class SalvoController {
 
         gamePlayerRepository.save(gamePlayer);
 
-        Game currentGame = gamePlayer.getGame();
-
         if (gamePlayer.getShips().size() == 5) {
             gamePlayer.setTurnToPlaceSalvoes(true);
             gamePlayerRepository.save(gamePlayer);
@@ -236,24 +245,19 @@ public class SalvoController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-//        if (gamePlayer.getSalvoes().size() > 0) {
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
-
         for (Salvo salvo: salvoes) {
-            System.out.println(salvo.getLocations());
             salvoRepository.save(salvo);
             gamePlayer.addSalvo(salvo);
+            salvoRepository.save(salvo);
         }
 
         gamePlayerRepository.save(gamePlayer);
 
-        Game currentGame = gamePlayer.getGame();
-        long currentTurn = currentGame.getTurn();
-        long updatedTurn = currentTurn + 1;
-        currentGame.setTurn(updatedTurn);
+        int currentTurn = gamePlayer.getTurn();
+        int updatedTurn = currentTurn + 1;
+        gamePlayer.setTurn(updatedTurn);
 
-        gameRepository.save(currentGame);
+        gamePlayerRepository.save(gamePlayer);
 
         gamePlayer.setTurnToPlaceSalvoes(false);
         gamePlayer.getOpponent().setTurnToPlaceSalvoes(true);
@@ -262,6 +266,8 @@ public class SalvoController {
         gamePlayerRepository.save(gamePlayer.getOpponent());
 
         GameDto updatedGameDto = getOneGame(gamePlayer.getId());
+
+        System.out.println();
 
         return new ResponseEntity<>(updatedGameDto, HttpStatus.CREATED);
     }
@@ -272,30 +278,6 @@ public class SalvoController {
                 .stream()
                 .map(game -> makeGameDto(game))
                 .collect(toList());
-    }
-
-    private Set<Ship> getOpponentShips(GamePlayer opponent) {
-
-        Set<Ship> ships = opponent.getShips();
-
-        return ships;
-    }
-
-    private List<String> getSalvoLocations(Long gamePlayerId) {
-
-        List<String> salvoLocations = new ArrayList<String>();
-
-        GamePlayer currentGamePlayer = gamePlayerRepository.getOne(gamePlayerId);
-
-        Set<Salvo> salvoes = currentGamePlayer.getSalvoes();
-
-        for (Salvo salvo: salvoes) {
-            System.out.println("salvo locations: " + salvo.getLocations());
-            salvoLocations = salvo.getLocations();
-
-        }
-
-        return salvoLocations;
     }
 
     private GamePlayerDto makeGamePlayerDto(GamePlayer gamePlayer) {
@@ -311,6 +293,8 @@ public class SalvoController {
         dto.setSalvoes(salvoDtos);
         dto.setFirstPlayer(gamePlayer.isFirstPlayer());
         dto.setTurnToPlaceSalvoes(gamePlayer.isTurnToPlaceSalvoes());
+        dto.setTurn(gamePlayer.getTurn());
+        dto.setRemainingShips(gamePlayer.getRemainingShips());
 
         return dto;
     }
@@ -343,7 +327,6 @@ public class SalvoController {
         dto.setCreated(game.getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setScores(scoreDtos);
-        dto.setTurn(game.getTurn());
 
         return dto;
     }
@@ -367,8 +350,12 @@ public class SalvoController {
 
     private ShipDto makeShipDto(Ship ship) {
 
+        GamePlayer gamePlayer = gamePlayerRepository.getOne(ship.getGamePlayer().getId());
+
+        Set<Salvo> opponentSalvoes = gamePlayer.getOpponent().getSalvoes();
+
         List<HitDto> hitDtos;
-        Set<Hit> hits = ship.getGamePlayer().getHits(ship.getGamePlayer().getOpponent().getSalvoes());
+        Set<Hit> hits = ship.getGamePlayer().getHits(opponentSalvoes);
 
         Set<Hit> shipHits = hits.stream()
                 .filter(hit -> hit.getShipType().equals(ship.getType()))

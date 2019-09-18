@@ -16,11 +16,31 @@ public class GamePlayerDto {
         return salvoDtos;
     }
 
+    private PlayerDto player;
+
+    private int turn;
+
+    private int remainingShips;
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public int getRemainingShips() {
+        return remainingShips;
+    }
+
+    public void setRemainingShips(int remainingShips) {
+        this.remainingShips = remainingShips;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
     public void setSalvoes(List<SalvoDto> salvoDtos) {
         this.salvoDtos = salvoDtos;
     }
-
-    private PlayerDto player;
 
     public PlayerDto getPlayer() {
         return player;

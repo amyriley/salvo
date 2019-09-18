@@ -23,7 +23,7 @@ var app = new Vue({
         {number: 1, type: "Submarine", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Destroyer", length: 3, positions: [], placing: false, placed: false}, 
         {number: 1, type: "Patrol boat", length: 2, positions: [], placing: false, placed: false}],
-        salvo: {turn: 1, locations: []},
+        salvo: {locations: []},
         salvoes: [],
         salvoTable: "salvoTable",
         shipLength: null,
@@ -32,135 +32,6 @@ var app = new Vue({
         endLocation: null,
         possibleShipPositions: [],
         placing: false,
-        game: {
-            "id": 1,
-            "created": "2019-09-05T14:14:06.289+0000",
-            "gamePlayers": [
-                {
-                    "id": 8,
-                    "player": {
-                        "id": 2,
-                        "email": "c.obrian@ctu.gov"
-                    },
-                    "salvoes": [
-                        {
-                            "turn": 2,
-                            "locations": [
-                                "E1",
-                                "H3",
-                                "A2"
-                            ],
-                            "hits": [
-                                "XX",
-                                "XX"
-                            ]
-                        },
-                        {
-                            "turn": 1,
-                            "locations": [
-                                "B4",
-                                "B5",
-                                "B6"
-                            ],
-                            "hits": [
-                                "XX",
-                                "XX"
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "id": 1,
-                    "player": {
-                        "id": 1,
-                        "email": "j.bauer@ctu.gov"
-                    },
-                    "salvoes": [
-                        {
-                            "turn": 1,
-                            "locations": [
-                                "B5",
-                                "C5",
-                                "F1"
-                            ],
-                            "hits": [
-                                "XX",
-                                "XX"
-                            ]
-                        },
-                        {
-                            "turn": 2,
-                            "locations": [
-                                "F2",
-                                "D5"
-                            ],
-                            "hits": [
-                                "XX",
-                                "XX"
-                            ]
-                        }
-                    ]
-                }
-            ],
-            "ships": [
-                {
-                    "type": "patrol boat",
-                    "locations": [
-                        "B4",
-                        "B5"
-                    ],            
-                    "hits": [
-                        {
-                            "turn": 1,
-                            "locations": ["XX"]    
-                        },
-                        {
-                            "turn": 2,
-                            "locations": ["XX"]
-                        }
-                    ],
-                    "sunk": false
-                },
-                {
-                    "type": "destroyer",
-                    "locations": [
-                        "H2",
-                        "H3",
-                        "H4"
-                    ],
-                    "hits": [
-                        {
-                            "turn": 1,
-                            "locations": ["XX"]    
-                        },
-                        {
-                            "turn": 2,
-                            "locations": ["XX"]
-                        }
-                    ],
-                    "sunk": false
-                },
-                {
-                    "type": "submarine",
-                    "locations": [
-                        "E1",
-                        "F1",
-                        "G1"
-                    ],
-                    "hits": [
-                        {
-                            "turn": 1,
-                            "locations": ["XX"]    
-                        },
-                        {
-                            "turn": 2,
-                            "locations": ["XX"]
-                        }
-                    ],
-                    "sunk": false
-                }
-            ]
-        },
         gameStats: [],
         turnToPlaceSalvoes: false,
         shipsPlaced: false  
@@ -228,7 +99,7 @@ var app = new Vue({
                     .then(data => {
                         console.log(data);
                         // this.setShipPositions(data);
-                        this.setSalvoesFiredByGamePlayerId(data);
+                        // this.setSalvoesFiredByGamePlayerId(data);
                         this.getSalvoesFiredByOpponent(data);
                         this.setHitPositions(data);
                         this.changeGamePlayerHeader(data);
@@ -339,6 +210,7 @@ var app = new Vue({
             }
         },
         sendSalvoLocations: function() {
+            console.log("this.salvo " + this.salvo)
             this.salvoes.push(this.salvo);
             console.log("test " + JSON.stringify(this.salvoes))
 
@@ -355,6 +227,10 @@ var app = new Vue({
             console.log(response)
             if (response.status == 201) {
                 console.log("Success!")
+                this.salvoes = [];
+                this.salvo.locations = [];
+                // console.log("clear this.salvoes " + this.salvoes)
+                // console.log("clear this.salvo " + this.salvo.locations)
             return response.json();
             } else {
                 alert("Error");
@@ -651,15 +527,19 @@ var app = new Vue({
             return id;
         },
         selectSalvoLocation: function(id) {
-            var coordinate = this.getCoordinate(id);
-            var element = this.getElement(id);
-
-            if (this.canPlaceSalvo(coordinate)) {
-                this.setSalvoPosition(coordinate, element);
-            } else if (!this.canPlaceSalvo(coordinate)) {
-                this.removeSalvoPosition(coordinate, element);
+            if (this.turnToPlaceSalvoes == true) {
+                var coordinate = this.getCoordinate(id);
+                var element = this.getElement(id);
+    
+                if (this.canPlaceSalvo(coordinate)) {
+                    this.setSalvoPosition(coordinate, element);
+                } else if (!this.canPlaceSalvo(coordinate)) {
+                    this.removeSalvoPosition(coordinate, element);
+                } else {
+                    alert("You've already fired the maximum 5 shots!");
+                }
             } else {
-                alert("You've already fired the maximum 5 shots!");
+                alert("It's not your turn to place a salvo!")
             }
         },
         getCoordinate: function(id) {
@@ -674,13 +554,16 @@ var app = new Vue({
             return element;
         },
         canPlaceSalvo: function(coordinate) {
+
             var allPositions = this.salvo.locations;
 
-            for (var i = 0; i < allPositions.length; i++) {
-                var alreadyPlacedPosition = allPositions[i];
-
-                if (alreadyPlacedPosition == coordinate) {
-                    return false;
+            if (allPositions.length > 0) {
+                for (var i = 0; i < allPositions.length; i++) {
+                    var alreadyPlacedPosition = allPositions[i];
+    
+                    if (alreadyPlacedPosition == coordinate) {
+                        return false;
+                    }
                 }
             }
 
@@ -1169,7 +1052,7 @@ var app = new Vue({
     },
     created: function () {
         this.fetchData();
-        this.gameView();
-        this.hitsOnYou();
+        // this.gameView();
+        // this.hitsOnYou();
     },
 });
