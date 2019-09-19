@@ -67,4 +67,9 @@ public class Game {
     public void setTurn(long turn) {
         this.turn = turn;
     }
+
+    public void addScore(Score score) {
+        score.setGame(this);
+        scores.add(score);
+    }
 }

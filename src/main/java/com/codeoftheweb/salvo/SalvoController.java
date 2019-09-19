@@ -23,6 +23,7 @@ public class SalvoController {
     private PasswordEncoder passwordEncoder;
     private ShipRepository shipRepository;
     private SalvoRepository salvoRepository;
+    private ScoreRepository scoreRepository;
 
     public SalvoController(
             GameRepository gameRepository,
@@ -30,7 +31,8 @@ public class SalvoController {
             PlayerRepository playerRepository,
             PasswordEncoder passwordEncoder,
             ShipRepository shipRepository,
-            SalvoRepository salvoRepository) {
+            SalvoRepository salvoRepository,
+            ScoreRepository scoreRepository) {
         this.gameRepository = gameRepository;
         this.gamePlayerRepository = gamePlayerRepository;
         this.playerRepository = playerRepository;
@@ -68,6 +70,19 @@ public class SalvoController {
             gamePlayerRepository.save(gamePlayer);
         }
 
+        gamePlayer.getPlayer().addScore(calculateScores(gamePlayer));
+        gamePlayer.getOpponent().getPlayer().addScore(calculateScores(gamePlayer.getOpponent()));
+
+        gamePlayerRepository.save(gamePlayer);
+        gamePlayerRepository.save(gamePlayer.getOpponent());
+
+        gamePlayer.getGame().addScore(calculateScores(gamePlayer));
+        gamePlayer.getGame().addScore(calculateScores(gamePlayer.getOpponent()));
+
+        gamePlayerRepository.save(gamePlayer);
+        gamePlayerRepository.save(gamePlayer.getOpponent());
+        gameRepository.save(gamePlayer.getGame());
+
         // TODO split out?
         List<GamePlayerDto> gamePlayerDtos = gamePlayer.getGame().getGamePlayers()
                 .stream()
@@ -79,11 +94,12 @@ public class SalvoController {
                 .map(ship -> makeShipDto(ship))
                 .collect(toList());
 
-        List<ScoreDto> scoreDtos = gamePlayer.getGame().getScores()
+        System.out.println("game scores: " + gamePlayer.getGame().getScores());
+
+        List<ScoreDto> scoreDtos = gamePlayer.getPlayer().getScores()
                 .stream()
                 .map(score -> makeScoreDto(score))
                 .collect(toList());
-
 
         List<Boolean> remainingShips = new ArrayList<>();
 
@@ -100,7 +116,10 @@ public class SalvoController {
         dto.setCreated(gamePlayer.getGame().getCreationTime());
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
+        dto.setGameOver(checkIfIsGameOver(gamePlayer));
         dto.setScores(scoreDtos);
+
+        gameRepository.save(gamePlayer.getGame());
 
         return dto;
     }
@@ -208,8 +227,6 @@ public class SalvoController {
         }
 
         for (Ship ship: ships) {
-            System.out.println(ship.getType());
-            System.out.println(ship.getLocations());
             shipRepository.save(ship);
             gamePlayer.addShip(ship);
         }
@@ -270,6 +287,52 @@ public class SalvoController {
         System.out.println();
 
         return new ResponseEntity<>(updatedGameDto, HttpStatus.CREATED);
+    }
+
+    private boolean checkIfIsGameOver(GamePlayer gamePlayer) {
+
+        if ((gamePlayer.getRemainingShips() == 0 || gamePlayer.getOpponent().getRemainingShips() == 0)
+        && (gamePlayer.getSalvoes().size() == gamePlayer.getOpponent().getSalvoes().size())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private Score calculateScores(GamePlayer gamePlayer) {
+
+        Game game = gamePlayer.getGame();
+        GamePlayer opponent = gamePlayer.getOpponent();
+
+        Score gamePlayerScore = new Score();
+
+        if (gamePlayer.getRemainingShips() == 0 && opponent.getRemainingShips() != 0) {
+
+            gamePlayerScore.setGame(game);
+            Date finishDate = new Date();
+            gamePlayerScore.setFinishDate(finishDate);
+            gamePlayerScore.setPlayer(gamePlayer.getPlayer());
+            gamePlayerScore.setResult(0);
+
+        } else if (gamePlayer.getRemainingShips() != 0 && opponent.getRemainingShips() == 0) {
+
+            gamePlayerScore.setGame(game);
+            Date finishDate = new Date();
+            gamePlayerScore.setFinishDate(finishDate);
+            gamePlayerScore.setPlayer(gamePlayer.getPlayer());
+            gamePlayerScore.setResult(1);
+
+        } else if (gamePlayer.getRemainingShips() == 0 && opponent.getRemainingShips() == 0) {
+
+            gamePlayerScore.setGame(game);
+            Date finishDate = new Date();
+            gamePlayerScore.setFinishDate(finishDate);
+            gamePlayerScore.setPlayer(gamePlayer.getPlayer());
+            gamePlayerScore.setResult(0.5);
+
+        }
+
+        return gamePlayerScore;
     }
 
     private List<GameDto> getAllGames() {

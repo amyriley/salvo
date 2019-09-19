@@ -10,6 +10,7 @@ public class GameDto {
     private List<GamePlayerDto> gamePlayers;
     private List<ShipDto> ships;
     private List<ScoreDto> scores;
+    private boolean isGameOver;
 
     public List<ShipDto> getShips() {
         return ships;
@@ -49,5 +50,13 @@ public class GameDto {
 
     public void setScores(List<ScoreDto> scores) {
         this.scores = scores;
+    }
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        isGameOver = gameOver;
     }
 }

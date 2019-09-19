@@ -229,8 +229,6 @@ var app = new Vue({
                 console.log("Success!")
                 this.salvoes = [];
                 this.salvo.locations = [];
-                // console.log("clear this.salvoes " + this.salvoes)
-                // console.log("clear this.salvo " + this.salvo.locations)
             return response.json();
             } else {
                 alert("Error");
@@ -531,7 +529,7 @@ var app = new Vue({
                 var coordinate = this.getCoordinate(id);
                 var element = this.getElement(id);
     
-                if (this.canPlaceSalvo(coordinate)) {
+                if (this.canPlaceSalvo(coordinate) && this.salvo.length <= 5) {
                     this.setSalvoPosition(coordinate, element);
                 } else if (!this.canPlaceSalvo(coordinate)) {
                     this.removeSalvoPosition(coordinate, element);

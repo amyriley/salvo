@@ -210,6 +210,8 @@ public class SalvoApplication {
 
 			Salvo salvo1Jack = new Salvo();
 			Salvo salvo2Jack = new Salvo();
+			Salvo salvo3Jack = new Salvo();
+			Salvo salvo4Jack = new Salvo();
 
 			List<String> salvo1JackLocations = new ArrayList<>(Arrays.asList("A10", "B10", "C10", "D10", "E10"));
 			salvo1Jack.setLocations(salvo1JackLocations);
@@ -219,17 +221,30 @@ public class SalvoApplication {
 			salvo2Jack.setLocations(salvo2JackLocations);
 			salvoRepository.save(salvo2Jack);
 
+			List<String> salvo3JackLocations = new ArrayList<>(Arrays.asList("B5", "C5", "D5", "F1", "F2"));
+			salvo3Jack.setLocations(salvo3JackLocations);
+			salvoRepository.save(salvo3Jack);
+
+			List<String> salvo4JackLocations = new ArrayList<>(Arrays.asList("F8", "F9", "F10"));
+			salvo4Jack.setLocations(salvo4JackLocations);
+			salvoRepository.save(salvo4Jack);
+
 			g1.addSalvo(salvo1Jack);
 			g1.addSalvo(salvo2Jack);
+			g1.addSalvo(salvo3Jack);
+			g1.addSalvo(salvo4Jack);
 			gamePlayerRepository.save(g1);
 			salvoRepository.save(salvo1Jack);
 			salvoRepository.save(salvo2Jack);
+			salvoRepository.save(salvo3Jack);
+			salvoRepository.save(salvo4Jack);
 
 			Salvo salvo1Chloe = new Salvo();
 			Salvo salvo2Chloe = new Salvo();
 			Salvo salvo3Chloe = new Salvo();
+			Salvo salvo4Chloe = new Salvo();
 
-			List<String> salvo1ChloeLocations = new ArrayList<>(Arrays.asList("A1", "A2", "A3", "A4", "A5"));
+			List<String> salvo1ChloeLocations = new ArrayList<>(Arrays.asList("A1", "A2", "B1", "D1", "E1"));
 			salvo1Chloe.setLocations(salvo1ChloeLocations);
 			salvoRepository.save(salvo1Chloe);
 
@@ -241,50 +256,55 @@ public class SalvoApplication {
 			salvo3Chloe.setLocations(salvo3ChloeLocations);
 			salvoRepository.save(salvo3Chloe);
 
+			List<String> salvo4ChloeLocations = new ArrayList<>(Arrays.asList("E1", "F1", "G1", "B4"));
+			salvo4Chloe.setLocations(salvo4ChloeLocations);
+			salvoRepository.save(salvo4Chloe);
 
 			g2.addSalvo(salvo1Chloe);
 			g2.addSalvo(salvo2Chloe);
 			g2.addSalvo(salvo3Chloe);
+			g2.addSalvo(salvo4Chloe);
 			gamePlayerRepository.save(g2);
 			salvoRepository.save(salvo1Chloe);
 			salvoRepository.save(salvo2Chloe);
 			salvoRepository.save(salvo3Chloe);
+			salvoRepository.save(salvo4Chloe);
 
-			Score score1 = new Score(0);
-			score1.setGame(game1);
-			score1.setPlayer(jBauer);
-			scoreRepository.save(score1);
+//			Score score1 = new Score(0);
+//			score1.setGame(game1);
+//			score1.setPlayer(jBauer);
+//			scoreRepository.save(score1);
 
-			jBauer.addScore(score1);
-			playerRepository.save(jBauer);
+//			jBauer.addScore(score1);
+//			playerRepository.save(jBauer);
+//
+//			Score score2 = new Score(1);
+//			score2.setGame(game1);
+//			score2.setPlayer(cObrian);
+//			scoreRepository.save(score2);
+//			playerRepository.save(cObrian);
+//			gameRepository.save(game1);
 
-			Score score2 = new Score(1);
-			score2.setGame(game1);
-			score2.setPlayer(cObrian);
-			scoreRepository.save(score2);
-			playerRepository.save(cObrian);
-			gameRepository.save(game1);
-
-			Score score3 = new Score(0.5);
-			Score score4 = new Score(0.5);
-
-			Score score5 = new Score(1);
-			Score score6 = new Score(1);
-
-			score3.setGame(game2);
-			score4.setGame(game2);
-			score3.setPlayer(tAlmeida);
-			score4.setPlayer(kBauer);
-
-			score5.setGame(game3);
-			score6.setGame(game3);
-			score5.setPlayer(jBauer);
-			score6.setPlayer(kBauer);
-
-			scoreRepository.save(score3);
-			scoreRepository.save(score4);
-			scoreRepository.save(score5);
-			scoreRepository.save(score6);
+//			Score score3 = new Score(0.5);
+//			Score score4 = new Score(0.5);
+//
+//			Score score5 = new Score(1);
+//			Score score6 = new Score(1);
+//
+//			score3.setGame(game2);
+//			score4.setGame(game2);
+//			score3.setPlayer(tAlmeida);
+//			score4.setPlayer(kBauer);
+//
+//			score5.setGame(game3);
+//			score6.setGame(game3);
+//			score5.setPlayer(jBauer);
+//			score6.setPlayer(kBauer);
+//
+//			scoreRepository.save(score3);
+//			scoreRepository.save(score4);
+//			scoreRepository.save(score5);
+//			scoreRepository.save(score6);
 
 			playerRepository.save(tAlmeida);
 			playerRepository.save(kBauer);
