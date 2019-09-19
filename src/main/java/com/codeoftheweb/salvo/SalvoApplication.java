@@ -118,7 +118,7 @@ public class SalvoApplication {
 			List<String> carrierLocationsJack = new ArrayList<>(Arrays.asList("A1", "B1", "C1", "D1", "E1"));
 			ship1.setLocations(carrierLocationsJack);
 
-			List<String> battleshipLocationsJack = new ArrayList<>(Arrays.asList("C1", "C2", "C4", "C5"));
+			List<String> battleshipLocationsJack = new ArrayList<>(Arrays.asList("C1", "C2", "C3", "C4"));
 			ship2.setLocations(battleshipLocationsJack);
 
 			List<String> submarineLocationsJack = new ArrayList<>(Arrays.asList("E1", "F1", "G1"));
@@ -263,7 +263,7 @@ public class SalvoApplication {
 			g2.addSalvo(salvo1Chloe);
 			g2.addSalvo(salvo2Chloe);
 			g2.addSalvo(salvo3Chloe);
-			g2.addSalvo(salvo4Chloe);
+//			g2.addSalvo(salvo4Chloe);
 			gamePlayerRepository.save(g2);
 			salvoRepository.save(salvo1Chloe);
 			salvoRepository.save(salvo2Chloe);

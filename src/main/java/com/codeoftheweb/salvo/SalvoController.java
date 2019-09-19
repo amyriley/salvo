@@ -70,18 +70,20 @@ public class SalvoController {
             gamePlayerRepository.save(gamePlayer);
         }
 
-        gamePlayer.getPlayer().addScore(calculateScores(gamePlayer));
-        gamePlayer.getOpponent().getPlayer().addScore(calculateScores(gamePlayer.getOpponent()));
+        if(gamePlayer.getGame().getGamePlayers().size() > 1) {
+            gamePlayer.getPlayer().addScore(calculateScores(gamePlayer));
+            gamePlayer.getOpponent().getPlayer().addScore(calculateScores(gamePlayer.getOpponent()));
 
-        gamePlayerRepository.save(gamePlayer);
-        gamePlayerRepository.save(gamePlayer.getOpponent());
+            gamePlayerRepository.save(gamePlayer);
+            gamePlayerRepository.save(gamePlayer.getOpponent());
 
-        gamePlayer.getGame().addScore(calculateScores(gamePlayer));
-        gamePlayer.getGame().addScore(calculateScores(gamePlayer.getOpponent()));
+            gamePlayer.getGame().addScore(calculateScores(gamePlayer));
+            gamePlayer.getGame().addScore(calculateScores(gamePlayer.getOpponent()));
 
-        gamePlayerRepository.save(gamePlayer);
-        gamePlayerRepository.save(gamePlayer.getOpponent());
-        gameRepository.save(gamePlayer.getGame());
+            gamePlayerRepository.save(gamePlayer);
+            gamePlayerRepository.save(gamePlayer.getOpponent());
+            gameRepository.save(gamePlayer.getGame());
+        }
 
         // TODO split out?
         List<GamePlayerDto> gamePlayerDtos = gamePlayer.getGame().getGamePlayers()
@@ -291,9 +293,13 @@ public class SalvoController {
 
     private boolean checkIfIsGameOver(GamePlayer gamePlayer) {
 
-        if ((gamePlayer.getRemainingShips() == 0 || gamePlayer.getOpponent().getRemainingShips() == 0)
-        && (gamePlayer.getSalvoes().size() == gamePlayer.getOpponent().getSalvoes().size())) {
-            return true;
+        if (gamePlayer.getGame().getGamePlayers().size() > 1) {
+
+            if ((gamePlayer.getRemainingShips() == 0 || gamePlayer.getOpponent().getRemainingShips() == 0)
+                    && (gamePlayer.getSalvoes().size() == gamePlayer.getOpponent().getSalvoes().size())) {
+
+                return true;
+            }
         }
 
         return false;
@@ -405,8 +411,26 @@ public class SalvoController {
 
     private SalvoDto makeSalvoDto(Salvo salvo) {
 
+        GamePlayer gamePlayer = gamePlayerRepository.getOne(salvo.getGamePlayer().getId());
+        GamePlayer opponent = gamePlayer.getOpponent();
+
+        System.out.println("hits on opponent " + opponent.getHits(gamePlayer.getSalvoes()));
+
+        List<HitDto> hitDtos;
+        Set<Hit> hits = opponent.getHits(gamePlayer.getSalvoes());
+
+        Set<Hit> salvoHits = hits.stream()
+                .filter(hit -> salvo.getLocations().contains(hit.getLocation()))
+                .collect(Collectors.toSet());
+
+        hitDtos = salvoHits
+                .stream()
+                .map(hit -> makeHitDto(hit))
+                .collect(toList());
+
         SalvoDto dto = new SalvoDto();
         dto.setLocations(salvo.getLocations());
+        dto.setHits(hitDtos);
 
         return dto;
     }
