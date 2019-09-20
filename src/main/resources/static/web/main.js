@@ -35,7 +35,8 @@ var app = new Vue({
         gameStats: [],
         turnToPlaceSalvoes: false,
         shipsPlaced: false,
-        gameOver: false  
+        gameOver: false,  
+        shipBeingPlaced: false
     },
     methods: {
         fetchData: function() {
@@ -58,9 +59,11 @@ var app = new Vue({
                         this.getShipHits(data);
                         this.getHitsOnOpponent(data);
                         this.showSalvoesFired(data);
+                        this.showHitsOnOpponent(this.getHitsOnOpponent(data))
                         this.getSalvoesFiredByOpponent(data);
                         this.changeGamePlayerHeader(data);
                         this.turnToPlaceSalvoes = this.getTurnToPlaceSalvoes(data, this.gamePlayerId);
+                        this.shipsPlaced = this.allShipsPlaced();
                         this.gameOver = this.checkGameOverStatus(data);
                         setTimeout(this.fetchData, 5000);
                     })
@@ -209,6 +212,8 @@ var app = new Vue({
             return turnToPlaceSalvoes;
         },
         selectShip: function() {
+            this.shipBeingPlaced = true;
+
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
             var shipType = document.querySelector('input[name="ship_selector"]:checked').id;
             var ships = this.ships;
@@ -440,6 +445,8 @@ var app = new Vue({
                 }
             }
 
+            this.shipBeingPlaced = false;
+
             this.getAllPlacedShipPositions();
         },
         showShipPositions: function(data) {
@@ -486,7 +493,7 @@ var app = new Vue({
             return allPlacedShipPositions;
         },
         selectShipLocation: function(id) {
-            if (this.canPlaceShip(id)) {
+            if (this.canPlaceShip(id) && this.shipBeingPlaced == true) {
                 this.location = id;
     
                 if (!this.placing && this.checkIfValidFinalLocation(id)) {
@@ -547,18 +554,21 @@ var app = new Vue({
                 })
             }
 
-            this.showHitsOnOpponent(hitLocations);
+            // this.showHitsOnOpponent(hitLocations);
+
+            return hitLocations;
         },
         showHitsOnOpponent: function(hitLocations) {
             var table = document.getElementById('salvoTable');
             var targetTDs = table.querySelectorAll('td');
 
             for (var i = 0; i < targetTDs.length; i++) {
-                var tdId = targetTDs[i].id;
+                var tdId = targetTDs[i].id.substring(10);
         
                 for (var j = 0; j < hitLocations.length; j++) {
-                    if (tdId.includes(hitLocations[j])) {
-                        document.getElementById(tdId).innerHTML = "X";
+                    if (tdId == hitLocations[j]) {
+                        elementId = "salvoTable" + tdId;
+                        document.getElementById(elementId).innerHTML = "X";
                     }
                 }
             }
@@ -586,10 +596,10 @@ var app = new Vue({
             }
         
             for (var i = 0; i < targetTDs.length; i++) {
-                var tdId = targetTDs[i].id;
+                var tdId = targetTDs[i].id.substring(10);
         
                 for (var j = 0; j < salvoLocations.length; j++) {
-                    if (tdId.includes(salvoLocations[j])) {
+                    if (tdId == salvoLocations[j]) {
                         targetTDs[i].style.backgroundColor = "yellow";
                     }
                 }

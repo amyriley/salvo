@@ -12,8 +12,8 @@
         <div class="container">
             <div>
                 <p v-if="shipsPlaced == false">Place your ships!</p>
-                <p v-if="turnToPlaceSalvoes == true && shipsPlaced == true">It's your turn to fire a salvo!</p>
-                <p v-if="turnToPlaceSalvoes == false && shipsPlaced == true">It's not your turn to fire a salvo...</p>
+                <p v-if="turnToPlaceSalvoes == true && shipsPlaced == true && !gameOver">It's your turn to fire a salvo!</p>
+                <p v-if="turnToPlaceSalvoes == false && shipsPlaced == true && !gameOver">It's not your turn to fire a salvo...</p>
                 <p v-if="gameOver">Game over!</p>
             </div>
             <div class="row">
