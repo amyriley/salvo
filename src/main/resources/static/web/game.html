@@ -1,19 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="stylesheet" src="styles.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <meta charset="UTF-8">
     <title>Ship Locations!</title>
 </head>
+
 <body>
     <div id="app">
         <button v-on:click="postLogout" type="submit" class="btn btn-primary">Logout</button>
         <div class="container">
             <div>
                 <p v-if="shipsPlaced == false">Place your ships!</p>
-                <p v-if="turnToPlaceSalvoes == true && shipsPlaced == true && !gameOver">It's your turn to fire a salvo!</p>
-                <p v-if="turnToPlaceSalvoes == false && shipsPlaced == true && !gameOver">It's not your turn to fire a salvo...</p>
+                <p v-if="turnToPlaceSalvoes == true && shipsPlaced == true && !gameOver">It's your turn to fire a salvo!
+                </p>
+                <p v-if="turnToPlaceSalvoes == false && shipsPlaced == true && !gameOver">It's not your turn to fire a
+                    salvo...</p>
                 <p v-if="gameOver">Game over!</p>
             </div>
             <div class="row">
@@ -27,10 +32,11 @@
                             </tr>
                         </thead>
                         <tbody v-for="letter in rows" id="table-rows-game">
-                                <th>{{letter}}</th>
-                                <td v-on:click="selectShipLocation(letter + number)" style='width: 50px' v-for="number in headers" :id="letter + number"></td>
+                            <th>{{letter}}</th>
+                            <td v-on:click="selectShipLocation(letter + number)" style='width: 50px'
+                                v-for="number in headers" :id="letter + number"></td>
                         </tbody>
-                    </table>  
+                    </table>
                 </div>
                 <div v-if="shipsPlaced == false" class="col-sm">
                     <h4>Place your ships</h4>
@@ -48,38 +54,42 @@
                                 <td>{{ship.number}}</td>
                                 <td>{{ship.type}}</td>
                                 <td>{{ship.length}}</td>
-                                <td >
-                                    <input v-on:change="selectShip" type="radio" name="ship_selector" :id="ship.type" :value="ship.length">
+                                <td>
+                                    <input v-on:change="selectShip" type="radio" name="ship_selector" :id="ship.type"
+                                        :value="ship.length">
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    <div>
+                        <button v-if="shipsPlaced == false" :id="confirm-ships" v-on:click="shipLocations" type="submit"
+                            class="btn btn-primary">Confirm ships</button>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <button v-if="shipsPlaced == false" :id="confirm-ships" v-on:click="shipLocations" type="submit" class="btn btn-primary">Confirm ships</button>
-            </div>
-            <div class="row">
                 <div class="col-sm">
-                    <h4>Salvoes fired by you...</h4>
+                    <h4>Salvoes fired at opponent...</h4>
                     <table id="salvoTable" class="table table-bordered" style="width: 500px">
-                            <thead id="table-headers-salvo">
-                                <tr>
-                                    <th></th>
-                                    <th v-for="number in headers">{{number}}</th>
-                                </tr>
-                            </thead>
-                            <tbody v-for="letter in rows" id="table-rows-salvo">
-                                    <th>{{letter}}</th>
-                                    <td v-on:click="selectSalvoLocation(salvoTable + letter + number)" style='width: 50px' v-for="number in headers" :id="salvoTable + letter + number"></td>
-                            </tbody>
+                        <thead id="table-headers-salvo">
+                            <tr>
+                                <th></th>
+                                <th v-for="number in headers">{{number}}</th>
+                            </tr>
+                        </thead>
+                        <tbody v-for="letter in rows" id="table-rows-salvo">
+                            <th>{{letter}}</th>
+                            <td v-on:click="selectSalvoLocation(salvoTable + letter + number)" style='width: 50px'
+                                v-for="number in headers" :id="salvoTable + letter + number"></td>
+                        </tbody>
                     </table>
-                </div>
-                <div v-if="turnToPlaceSalvoes == true">
-                    <button :id="confirm-salvo" v-on:click="sendSalvoLocations" type="submit" class="btn btn-primary">Confirm salvo</button>
+                    <div v-if="turnToPlaceSalvoes == true">
+                        <button :id="confirm-salvo" v-on:click="sendSalvoLocations" type="submit"
+                            class="btn btn-primary">Confirm salvo</button>
+                    </div>
                 </div>
             </div>
             <div class="row">
+            </div>
+            <!-- <div class="row">
                     <div class="col-sm">
                         <h4>Game stats</h4>
                         <table id="gameStatsTable" class="table table-bordered" style="width: 500px">
@@ -103,13 +113,18 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> -->
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+    </script>
 </body>
+
 </html>

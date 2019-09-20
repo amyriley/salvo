@@ -36,7 +36,7 @@ var app = new Vue({
         turnToPlaceSalvoes: false,
         shipsPlaced: false,
         gameOver: false,  
-        shipBeingPlaced: false
+        shipSelected: false
     },
     methods: {
         fetchData: function() {
@@ -63,7 +63,8 @@ var app = new Vue({
                         this.getSalvoesFiredByOpponent(data);
                         this.changeGamePlayerHeader(data);
                         this.turnToPlaceSalvoes = this.getTurnToPlaceSalvoes(data, this.gamePlayerId);
-                        this.shipsPlaced = this.allShipsPlaced();
+                        this.shipsPlaced = this.checkIfShipsPlaced(data);
+                        console.log("shipsPlaced " + this.shipsPlaced);
                         this.gameOver = this.checkGameOverStatus(data);
                         setTimeout(this.fetchData, 5000);
                     })
@@ -212,7 +213,7 @@ var app = new Vue({
             return turnToPlaceSalvoes;
         },
         selectShip: function() {
-            this.shipBeingPlaced = true;
+            this.shipSelected = true;
 
             var shipLength = document.querySelector('input[name="ship_selector"]:checked').value;
             var shipType = document.querySelector('input[name="ship_selector"]:checked').id;
@@ -233,14 +234,20 @@ var app = new Vue({
 
             for (var i = 0; i < ships.length; i++) {
                 if (ships[i].positions.length == 0) {
-                    this.shipsPlaced = false;
                     return false;
                 }
             }
 
-            this.shipsPlaced = true;
-
             return true;
+        },
+        checkIfShipsPlaced: function(data) {
+            var ships = data.ships;
+
+            if (ships.length == 5) {
+                return true;
+            }
+
+            return false;
         },
         showStartLocation: function(location) {
             var table = document.getElementById("gameTable");
@@ -445,8 +452,6 @@ var app = new Vue({
                 }
             }
 
-            this.shipBeingPlaced = false;
-
             this.getAllPlacedShipPositions();
         },
         showShipPositions: function(data) {
@@ -493,12 +498,13 @@ var app = new Vue({
             return allPlacedShipPositions;
         },
         selectShipLocation: function(id) {
-            if (this.canPlaceShip(id) && this.shipBeingPlaced == true) {
+            if (this.canPlaceShip(id) && this.shipSelected) {
                 this.location = id;
     
                 if (!this.placing && this.checkIfValidFinalLocation(id)) {
                     this.showStartLocation(id);
                     this.placing = true;
+                    this.shipSelected = false;
                 }
             }
 
@@ -609,13 +615,14 @@ var app = new Vue({
             if (this.turnToPlaceSalvoes == true) {
                 var coordinate = this.getCoordinate(id);
                 var element = this.getElement(id);
+
+                console.log(this.salvo)
+                console.log
     
                 if (this.canPlaceSalvo(coordinate)) {
                     this.setSalvoPosition(coordinate, element);
                 } else if (!this.canPlaceSalvo(coordinate)) {
                     this.removeSalvoPosition(coordinate, element);
-                } else {
-                    alert("You've already fired the maximum 5 shots!");
                 }
             } else {
                 alert("It's not your turn to place a salvo!")
@@ -635,6 +642,8 @@ var app = new Vue({
         canPlaceSalvo: function(coordinate) {
             var allPositions = this.salvo.locations;
 
+            console.log("allPositions " + allPositions)
+
             if (allPositions.length > 0) {
                 for (var i = 0; i < allPositions.length; i++) {
                     var alreadyPlacedPosition = allPositions[i];
@@ -650,10 +659,12 @@ var app = new Vue({
         setSalvoPosition: function(coordinate, element) {
             var salvo = this.salvo;
 
-            salvo.locations.push(coordinate);
-            console.log("salvo positions " + salvo.locations);
-
-            this.changeElementBackgroundColor(element, "black");
+            if (salvo.locations.length < 5) {
+                salvo.locations.push(coordinate);
+                this.changeElementBackgroundColor(element, "black");
+            } else {
+                alert("You've already fired 5 shots!")
+            }
         },
         removeSalvoPosition: function(coordinate, element) {    
             var index = this.salvo.locations.indexOf(coordinate);
