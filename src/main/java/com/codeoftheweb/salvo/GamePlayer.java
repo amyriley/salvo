@@ -161,7 +161,7 @@ public class GamePlayer {
                     Hit hit = new Hit();
                     hit.setLocation(salvoLocation);
                     hit.setShipType(ship.getType());
-                    hit.setTurn(ship.getGamePlayer().getOpponent().getTurn());
+                    hit.setTurn(ship.getGamePlayer().getOpponent().getSalvoes().size());
                     hits.add(hit);
                 }
             }

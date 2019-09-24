@@ -39,10 +39,6 @@ public class Game {
         this.creationTime = creationTime;
     }
 
-    public void addGamePlayer(GamePlayer gameplayer) {
-        gameplayer.setGame(this);
-        gamePlayers.add(gameplayer);
-    }
 
     public Set<GamePlayer> getGamePlayers() {
         return gamePlayers;
@@ -62,6 +58,11 @@ public class Game {
 
     public long getTurn() {
         return turn;
+    }
+
+    public void addGamePlayer(GamePlayer gameplayer) {
+        gameplayer.setGame(this);
+        gamePlayers.add(gameplayer);
     }
 
     public void setTurn(long turn) {

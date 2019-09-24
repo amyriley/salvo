@@ -37,7 +37,7 @@ var app = new Vue({
         shipsPlaced: false,
         gameOver: false,  
         shipSelected: false,
-        result: 0
+        result: 0,
     },
     methods: {
         fetchData: function() {
@@ -1066,7 +1066,7 @@ var app = new Vue({
                 if (id == this.gamePlayerId) {
                     emails.push(email + " (you)")
                 } else {
-                    emails.push(" " + email + " ");
+                    emails.push(" " + email + " (opponent) ");
                 }
             }
 

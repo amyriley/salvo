@@ -39,6 +39,7 @@ public class SalvoController {
         this.passwordEncoder = passwordEncoder;
         this.shipRepository = shipRepository;
         this.salvoRepository = salvoRepository;
+        this.scoreRepository = scoreRepository;
     }
 
     @RequestMapping(value = "/username")
@@ -55,12 +56,12 @@ public class SalvoController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        GameDto gameDto = getOneGame(gamePlayerId);
+        GameDto gameDto = getGame(gamePlayerId);
 
         return new ResponseEntity<>(gameDto, HttpStatus.CREATED);
     }
 
-    private GameDto getOneGame(Long gamePlayerId) {
+    private GameDto getGame(Long gamePlayerId) {
 
         GameDto dto = new GameDto();
         GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
@@ -70,18 +71,14 @@ public class SalvoController {
             gamePlayerRepository.save(gamePlayer);
         }
 
-        if(gamePlayer.getGame().getGamePlayers().size() > 1) {
+        if (checkIfIsGameOver(gamePlayer)) {
             gamePlayer.getPlayer().addScore(calculateScores(gamePlayer));
-            gamePlayer.getOpponent().getPlayer().addScore(calculateScores(gamePlayer.getOpponent()));
 
             gamePlayerRepository.save(gamePlayer);
-            gamePlayerRepository.save(gamePlayer.getOpponent());
 
             gamePlayer.getGame().addScore(calculateScores(gamePlayer));
-            gamePlayer.getGame().addScore(calculateScores(gamePlayer.getOpponent()));
 
             gamePlayerRepository.save(gamePlayer);
-            gamePlayerRepository.save(gamePlayer.getOpponent());
             gameRepository.save(gamePlayer.getGame());
         }
 
@@ -116,7 +113,10 @@ public class SalvoController {
         dto.setGamePlayers(gamePlayerDtos);
         dto.setShips(shipDtos);
         dto.setGameOver(checkIfIsGameOver(gamePlayer));
-        dto.setScores(scoreDtos);
+
+        if (checkIfIsGameOver(gamePlayer)) {
+            dto.setScores(scoreDtos);
+        }
 
         gameRepository.save(gamePlayer.getGame());
 
@@ -154,8 +154,6 @@ public class SalvoController {
 
     @RequestMapping(value = "/game/{gameId}/players", method = RequestMethod.POST)
     public ResponseEntity<GamePlayerDto> joinGame(@PathVariable Long gameId, Authentication authentication) {
-
-        System.out.println("gameId " + gameId);
 
         Player currentUser = playerRepository.findByUsername(authentication.getName());
 
@@ -202,11 +200,12 @@ public class SalvoController {
         return new ResponseEntity<>("Named added", HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<GameDto> shipLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Ship> ships) {
+    @RequestMapping(value = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST,
+            consumes = "application/json", produces = "application/json")
+    public ResponseEntity<GameDto> shipLocations(@PathVariable Long gamePlayerId, Authentication authentication,
+                                                 @RequestBody Set<Ship> ships) {
 
         Player currentUser = playerRepository.findByUsername(authentication.getName());
-
         GamePlayer gamePlayer = gamePlayerRepository.getOne(gamePlayerId);
 
         if (currentUser == null) {
@@ -237,13 +236,15 @@ public class SalvoController {
             gamePlayerRepository.save(gamePlayer);
         }
 
-        GameDto updatedGameDto = getOneGame(gamePlayer.getId());
+        GameDto updatedGameDto = getGame(gamePlayer.getId());
 
         return new ResponseEntity<>(updatedGameDto, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-    public ResponseEntity<GameDto> salvoLocations(@PathVariable Long gamePlayerId, Authentication authentication, @RequestBody Set<Salvo> salvoes) {
+    @RequestMapping(value = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST,
+            consumes = "application/json", produces = "application/json")
+    public ResponseEntity<GameDto> salvoLocations(@PathVariable Long gamePlayerId, Authentication authentication,
+                                                  @RequestBody Set<Salvo> salvoes) {
 
         Player currentUser = playerRepository.findByUsername(authentication.getName());
 
@@ -261,6 +262,14 @@ public class SalvoController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
+        if (!gamePlayer.isTurnToPlaceSalvoes()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        if (checkIfIsGameOver(gamePlayer)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         for (Salvo salvo: salvoes) {
             salvoRepository.save(salvo);
             gamePlayer.addSalvo(salvo);
@@ -269,9 +278,8 @@ public class SalvoController {
 
         gamePlayerRepository.save(gamePlayer);
 
-        int currentTurn = gamePlayer.getTurn();
-        int updatedTurn = currentTurn + 1;
-        gamePlayer.setTurn(updatedTurn);
+        int turn = gamePlayer.getSalvoes().size();
+        gamePlayer.setTurn(turn);
 
         gamePlayerRepository.save(gamePlayer);
 
@@ -281,9 +289,7 @@ public class SalvoController {
         gamePlayerRepository.save(gamePlayer);
         gamePlayerRepository.save(gamePlayer.getOpponent());
 
-        GameDto updatedGameDto = getOneGame(gamePlayer.getId());
-
-        System.out.println();
+        GameDto updatedGameDto = getGame(gamePlayer.getId());
 
         return new ResponseEntity<>(updatedGameDto, HttpStatus.CREATED);
     }
@@ -295,6 +301,9 @@ public class SalvoController {
 
             if ((gamePlayer.getRemainingShips() == 0 || gamePlayer.getOpponent().getRemainingShips() == 0)
                     && (gamePlayer.getSalvoes().size() == gamePlayer.getOpponent().getSalvoes().size())) {
+
+                gamePlayer.setTurnToPlaceSalvoes(false);
+                gamePlayer.getOpponent().setTurnToPlaceSalvoes(false);
 
                 return true;
             }
@@ -324,6 +333,8 @@ public class SalvoController {
             gamePlayerScore.setResult(0.5);
         }
 
+        scoreRepository.save(gamePlayerScore);
+
         return gamePlayerScore;
     }
 
@@ -348,7 +359,7 @@ public class SalvoController {
         dto.setSalvoes(salvoDtos);
         dto.setFirstPlayer(gamePlayer.isFirstPlayer());
         dto.setTurnToPlaceSalvoes(gamePlayer.isTurnToPlaceSalvoes());
-        dto.setTurn(gamePlayer.getTurn());
+        dto.setTurn(gamePlayer.getSalvoes().size());
         dto.setRemainingShips(gamePlayer.getRemainingShips());
 
         return dto;
@@ -399,8 +410,6 @@ public class SalvoController {
 
         GamePlayer gamePlayer = gamePlayerRepository.getOne(salvo.getGamePlayer().getId());
         GamePlayer opponent = gamePlayer.getOpponent();
-
-        System.out.println("hits on opponent " + opponent.getHits(gamePlayer.getSalvoes()));
 
         List<HitDto> hitDtos;
         Set<Hit> hits = opponent.getHits(gamePlayer.getSalvoes());
