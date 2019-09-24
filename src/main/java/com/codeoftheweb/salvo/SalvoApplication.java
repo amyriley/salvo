@@ -167,7 +167,7 @@ public class SalvoApplication {
 			Game game2 = new Game();
 			Game game3 = new Game();
 			Game game4 = new Game();
-			Game game5 = new Game();
+//			Game game5 = new Game();
 
 			Date creationDate = new Date();
 			game2.setCreationTime(Date.from(creationDate.toInstant().plusSeconds(3600)));
@@ -176,7 +176,7 @@ public class SalvoApplication {
 			gameRepository.save(game2);
 			gameRepository.save(game3);
 			gameRepository.save(game4);
-			gameRepository.save(game5);
+//			gameRepository.save(game5);
 
 			GamePlayer g3 = new GamePlayer(kBauer, game2);
 			GamePlayer g4 = new GamePlayer(tAlmeida, game2);
@@ -193,7 +193,7 @@ public class SalvoApplication {
 			gameRepository.save(game2);
 			gameRepository.save(game3);
 			gameRepository.save(game4);
-			gameRepository.save(game5);
+//			gameRepository.save(game5);
 
 
 //			g3.addShip(ship5);
@@ -263,7 +263,7 @@ public class SalvoApplication {
 			g2.addSalvo(salvo1Chloe);
 			g2.addSalvo(salvo2Chloe);
 			g2.addSalvo(salvo3Chloe);
-//			g2.addSalvo(salvo4Chloe);
+			g2.addSalvo(salvo4Chloe);
 			gamePlayerRepository.save(g2);
 			salvoRepository.save(salvo1Chloe);
 			salvoRepository.save(salvo2Chloe);

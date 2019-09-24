@@ -36,7 +36,8 @@ var app = new Vue({
         turnToPlaceSalvoes: false,
         shipsPlaced: false,
         gameOver: false,  
-        shipSelected: false
+        shipSelected: false,
+        result: 0
     },
     methods: {
         fetchData: function() {
@@ -64,8 +65,10 @@ var app = new Vue({
                         this.changeGamePlayerHeader(data);
                         this.turnToPlaceSalvoes = this.getTurnToPlaceSalvoes(data, this.gamePlayerId);
                         this.shipsPlaced = this.checkIfShipsPlaced(data);
-                        console.log("shipsPlaced " + this.shipsPlaced);
                         this.gameOver = this.checkGameOverStatus(data);
+                        if(this.checkGameOverStatus(data)) {
+                            this.showResult(data);
+                        }
                         setTimeout(this.fetchData, 5000);
                     })
                     .catch(error => {
@@ -87,7 +90,7 @@ var app = new Vue({
                 .then(games => {
                     console.log(games.games)
                     console.log("games " + games)
-                    this.getGamePlayers
+                    this.getGamePlayers;
                     this.games = games.games;
                     this.getPlayers(games.games);
                     this.getGamesList(games.games);
@@ -200,6 +203,17 @@ var app = new Vue({
 
             return true;
         }, 
+        showResult: function(data) {
+            var scores = data.scores;
+
+            for (var i = 0; i < scores.length; i++) {
+                this.result = scores[i].result;
+            }
+
+            console.log("result " + this.result);
+
+            return this.result;
+        },
         getTurnToPlaceSalvoes: function(data, gamePlayerId) {
             var gamePlayers = data.gamePlayers;
             var turnToPlaceSalvoes;
@@ -538,6 +552,7 @@ var app = new Vue({
                 for (var j = 0; j < hits.length; j++) {
                     if (tdId == hits[j]) {
                         document.getElementById(tdId).innerHTML = "X";
+                        document.getElementById(tdId).style.textAlign = "center";
                     }
                 }
             }
@@ -575,6 +590,7 @@ var app = new Vue({
                     if (tdId == hitLocations[j]) {
                         elementId = "salvoTable" + tdId;
                         document.getElementById(elementId).innerHTML = "X";
+                        document.getElementById(elementId).style.textAlign = "center";
                     }
                 }
             }
@@ -663,7 +679,7 @@ var app = new Vue({
                 salvo.locations.push(coordinate);
                 this.changeElementBackgroundColor(element, "black");
             } else {
-                alert("You've already fired 5 shots!")
+                alert("You've already selected the maximum 5 shots!")
             }
         },
         removeSalvoPosition: function(coordinate, element) {    

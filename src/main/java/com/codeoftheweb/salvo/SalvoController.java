@@ -85,7 +85,6 @@ public class SalvoController {
             gameRepository.save(gamePlayer.getGame());
         }
 
-        // TODO split out?
         List<GamePlayerDto> gamePlayerDtos = gamePlayer.getGame().getGamePlayers()
                 .stream()
                 .map(player -> makeGamePlayerDto(player))
@@ -95,8 +94,6 @@ public class SalvoController {
                 .stream()
                 .map(ship -> makeShipDto(ship))
                 .collect(toList());
-
-        System.out.println("game scores: " + gamePlayer.getGame().getScores());
 
         List<ScoreDto> scoreDtos = gamePlayer.getPlayer().getScores()
                 .stream()
@@ -293,7 +290,8 @@ public class SalvoController {
 
     private boolean checkIfIsGameOver(GamePlayer gamePlayer) {
 
-        if (gamePlayer.getGame().getGamePlayers().size() > 1) {
+        if (gamePlayer.getGame().getGamePlayers().size() > 1 && gamePlayer.getSalvoes().size() > 0
+        && gamePlayer.getOpponent().getSalvoes().size() > 0) {
 
             if ((gamePlayer.getRemainingShips() == 0 || gamePlayer.getOpponent().getRemainingShips() == 0)
                     && (gamePlayer.getSalvoes().size() == gamePlayer.getOpponent().getSalvoes().size())) {
@@ -311,31 +309,19 @@ public class SalvoController {
         GamePlayer opponent = gamePlayer.getOpponent();
 
         Score gamePlayerScore = new Score();
+        gamePlayerScore.setGame(game);
+        Date finishDate = new Date();
+        gamePlayerScore.setFinishDate(finishDate);
+        gamePlayerScore.setPlayer(gamePlayer.getPlayer());
 
         if (gamePlayer.getRemainingShips() == 0 && opponent.getRemainingShips() != 0) {
-
-            gamePlayerScore.setGame(game);
-            Date finishDate = new Date();
-            gamePlayerScore.setFinishDate(finishDate);
-            gamePlayerScore.setPlayer(gamePlayer.getPlayer());
             gamePlayerScore.setResult(0);
 
         } else if (gamePlayer.getRemainingShips() != 0 && opponent.getRemainingShips() == 0) {
-
-            gamePlayerScore.setGame(game);
-            Date finishDate = new Date();
-            gamePlayerScore.setFinishDate(finishDate);
-            gamePlayerScore.setPlayer(gamePlayer.getPlayer());
             gamePlayerScore.setResult(1);
 
         } else if (gamePlayer.getRemainingShips() == 0 && opponent.getRemainingShips() == 0) {
-
-            gamePlayerScore.setGame(game);
-            Date finishDate = new Date();
-            gamePlayerScore.setFinishDate(finishDate);
-            gamePlayerScore.setPlayer(gamePlayer.getPlayer());
             gamePlayerScore.setResult(0.5);
-
         }
 
         return gamePlayerScore;

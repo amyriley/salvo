@@ -36,6 +36,23 @@ h4 {
     border-color: #46BEB5 !important;
 }
 
-.logout-header {
-    display: flex;
+p {
+    font-size: 20px;
+    color: #EFEFEF !important;
+}
+
+.salvoes-title {
+    font-family: 'good_times_rg';
+    color: #EFEFEF;
+    font-size: 20px;
+    padding-top: 50px;
+    padding-bottom: 13.5px;
+}
+
+#gamePlayerHeader {
+    font-family: 'good_times_rg';
+    color: #EFEFEF;
+    font-size: 20px;
+    padding-top: 50px;
+    padding-bottom: 5px;
 }
