@@ -35,6 +35,11 @@ public class SalvoApplication extends SpringBootServletInitializer {
 		SpringApplication.run(SalvoApplication.class, args);
 	}
 
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(SalvoApplication.class);
+    }
+
 	@Bean
 	public PasswordEncoder passwordEncoder(){
 		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -367,11 +372,6 @@ public class SalvoApplication extends SpringBootServletInitializer {
                 session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
             }
         }
-	}
-
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		return builder.sources(Application.class);
 	}
 }
 
