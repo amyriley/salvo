@@ -1,5 +1,7 @@
 package com.codeoftheweb.salvo;
 
+import javafx.application.Application;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -365,6 +367,11 @@ public class SalvoApplication extends SpringBootServletInitializer {
                 session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
             }
         }
+	}
+
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+		return builder.sources(Application.class);
 	}
 }
 
