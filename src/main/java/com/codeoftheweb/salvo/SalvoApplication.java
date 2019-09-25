@@ -1,5 +1,6 @@
 package com.codeoftheweb.salvo;
 
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @SpringBootApplication
-public class SalvoApplication {
+public class SalvoApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SalvoApplication.class, args);
@@ -269,42 +270,6 @@ public class SalvoApplication {
 			salvoRepository.save(salvo2Chloe);
 			salvoRepository.save(salvo3Chloe);
 			salvoRepository.save(salvo4Chloe);
-
-//			Score score1 = new Score(0);
-//			score1.setGame(game1);
-//			score1.setPlayer(jBauer);
-//			scoreRepository.save(score1);
-
-//			jBauer.addScore(score1);
-//			playerRepository.save(jBauer);
-//
-//			Score score2 = new Score(1);
-//			score2.setGame(game1);
-//			score2.setPlayer(cObrian);
-//			scoreRepository.save(score2);
-//			playerRepository.save(cObrian);
-//			gameRepository.save(game1);
-
-//			Score score3 = new Score(0.5);
-//			Score score4 = new Score(0.5);
-//
-//			Score score5 = new Score(1);
-//			Score score6 = new Score(1);
-//
-//			score3.setGame(game2);
-//			score4.setGame(game2);
-//			score3.setPlayer(tAlmeida);
-//			score4.setPlayer(kBauer);
-//
-//			score5.setGame(game3);
-//			score6.setGame(game3);
-//			score5.setPlayer(jBauer);
-//			score6.setPlayer(kBauer);
-//
-//			scoreRepository.save(score3);
-//			scoreRepository.save(score4);
-//			scoreRepository.save(score5);
-//			scoreRepository.save(score6);
 
 			playerRepository.save(tAlmeida);
 			playerRepository.save(kBauer);

@@ -55,7 +55,6 @@ var app = new Vue({
                 fetch(url, request)
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
                         this.showShipPositions(data);
                         this.getShipHits(data);
                         this.getHitsOnOpponent(data);
@@ -66,10 +65,12 @@ var app = new Vue({
                         this.turnToPlaceSalvoes = this.getTurnToPlaceSalvoes(data, this.gamePlayerId);
                         this.shipsPlaced = this.checkIfShipsPlaced(data);
                         this.gameOver = this.checkGameOverStatus(data);
-                        if(this.checkGameOverStatus(data)) {
+                        if (this.checkGameOverStatus(data)) {
                             this.showResult(data);
                         }
-                        setTimeout(this.fetchData, 5000);
+                        if (!this.gameOver){
+                            setTimeout(this.fetchData, 2000);
+                        }
                     })
                     .catch(error => {
                         console.log(error);
@@ -88,8 +89,6 @@ var app = new Vue({
             fetch(url, request)
                 .then(response => response.json())
                 .then(games => {
-                    console.log(games.games)
-                    console.log("games " + games)
                     this.getGamePlayers;
                     this.games = games.games;
                     this.getPlayers(games.games);
@@ -145,7 +144,7 @@ var app = new Vue({
               })
               .catch(error => console.log(error))
         },
-        shipLocations: function() {
+        sendShipLocations: function() {
             if (this.allShipsPlaced()) {
                 fetch("/api/games/players/" + this.gamePlayerId + "/ships", {
                     method: 'POST',
@@ -171,7 +170,6 @@ var app = new Vue({
             }
         },
         sendSalvoLocations: function() {
-            console.log("this.salvo " + this.salvo)
             this.salvoes.push(this.salvo);
 
             fetch("/api/games/players/" + this.gamePlayerId + "/salvos", {
@@ -209,8 +207,6 @@ var app = new Vue({
             for (var i = 0; i < scores.length; i++) {
                 this.result = scores[i].result;
             }
-
-            console.log("result " + this.result);
 
             return this.result;
         },
@@ -575,8 +571,6 @@ var app = new Vue({
                 })
             }
 
-            // this.showHitsOnOpponent(hitLocations);
-
             return hitLocations;
         },
         showHitsOnOpponent: function(hitLocations) {
@@ -631,9 +625,6 @@ var app = new Vue({
             if (this.turnToPlaceSalvoes == true) {
                 var coordinate = this.getCoordinate(id);
                 var element = this.getElement(id);
-
-                console.log(this.salvo)
-                console.log
     
                 if (this.canPlaceSalvo(coordinate)) {
                     this.setSalvoPosition(coordinate, element);
@@ -657,8 +648,6 @@ var app = new Vue({
         },
         canPlaceSalvo: function(coordinate) {
             var allPositions = this.salvo.locations;
-
-            console.log("allPositions " + allPositions)
 
             if (allPositions.length > 0) {
                 for (var i = 0; i < allPositions.length; i++) {
@@ -1059,15 +1048,19 @@ var app = new Vue({
             var emails = [];
             var gamePlayerHeader = document.getElementById("gamePlayerHeader");
 
-            for (var i = 0; i < data.gamePlayers.length; i++) {
-                var email = data.gamePlayers[i].player.email;
-                var id = data.gamePlayers[i].id;
+            if (data.gamePlayers[0].id == this.gamePlayerId) {
+                var email = data.gamePlayers[0].player.email;
+                emails.push(email + " (you)");
 
-                if (id == this.gamePlayerId) {
-                    emails.push(email + " (you)")
-                } else {
-                    emails.push(" " + email + " (opponent) ");
+                if (data.gamePlayers[1]) {
+                    var emailOpponent = data.gamePlayers[1].player.email;
+                    emails.push(" " + emailOpponent + " (opponent) ");
                 }
+            } else if (data.gamePlayers[1]) {
+                var email = data.gamePlayers[1].player.email;
+                emails.push(email + " (you)");
+                var emailOpponent = data.gamePlayers[0].player.email;
+                emails.push(" " + emailOpponent + " (opponent) ");
             }
 
             gamePlayerHeader.innerHTML = emails;
