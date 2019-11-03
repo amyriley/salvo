@@ -117,7 +117,7 @@ var app = new Vue({
                   alert("Game not created");
                 }
               }).then(function(data) {
-                  window.location.href = "http://localhost:8080/web/game.html?gp=" + data.id;
+                  window.location.href = "/web/game.html?gp=" + data.id;
               })
               .catch(error => console.log(error))
         },
@@ -140,7 +140,7 @@ var app = new Vue({
                   alert("You cannot join this game");
                 }
               }).then(function(data) {
-                  window.location.href = "http://localhost:8080/web/game.html?gp=" + data.id;
+                  window.location.href = "/web/game.html?gp=" + data.id;
               })
               .catch(error => console.log(error))
         },
@@ -848,7 +848,7 @@ var app = new Vue({
                 }
               })
               .then(function() {
-                window.location.href = "http://localhost:8080/web/games.html";
+                window.location.href = "/web/games.html";
               })
               .catch(error => console.log(error))
         },
