@@ -89,7 +89,6 @@ var app = new Vue({
             fetch(url, request)
                 .then(response => response.json())
                 .then(games => {
-                    console.log(games)
                     this.getGamePlayers;
                     this.games = games.games;
                     this.getPlayers(games.games);
@@ -118,7 +117,7 @@ var app = new Vue({
                   alert("Game not created");
                 }
               }).then(function(data) {
-                  window.location.href = "http://localhost:8080/web/game.html?gp=" + data.id;
+                  window.location.href = "/web/game.html?gp=" + data.id;
               })
               .catch(error => console.log(error))
         },
@@ -141,7 +140,7 @@ var app = new Vue({
                   alert("You cannot join this game");
                 }
               }).then(function(data) {
-                  window.location.href = "http://localhost:8080/web/game.html?gp=" + data.id;
+                  window.location.href = "/web/game.html?gp=" + data.id;
               })
               .catch(error => console.log(error))
         },
@@ -753,11 +752,8 @@ var app = new Vue({
 
             for (var i = 0; i < games.length; i++) {
                 var game = games[i];
-                var createdDateTime = new Date(game.created).toLocaleString();
-                var players = this.getGamePlayers(game.gamePlayers);
-
-                gamesList.push({id: game.id, created: createdDateTime, 
-                    players: players, 
+                gamesList.push({id: game.id, created: game.created.toLocaleString(), 
+                    players: this.getGamePlayers(game), 
                     gamePlayerIds: this.getGamePlayerEmails(game)});
             }
 
@@ -766,10 +762,16 @@ var app = new Vue({
         gamePlayerIdsContains: function(n) {
             return this.gamePlayerIds.indexOf(n) > -1
         },
-        getGamePlayers: function(gamePlayers) {
+        getGamePlayers: function(game) {
+            var gamePlayers = [];
             var players = [];
             var gamePlayerIds = [];
             var emails = [];
+
+            for (var i = 0; i < game.gamePlayers.length; i++) {
+                var gamePlayer = game.gamePlayers[i];
+                gamePlayers.push(gamePlayer);
+            }
 
             for (var i = 0; i < gamePlayers.length; i++) {
                 var player = gamePlayers[i].player;
@@ -846,7 +848,7 @@ var app = new Vue({
                 }
               })
               .then(function() {
-                window.location.href = "http://localhost:8080/web/games.html";
+                window.location.href = "/web/games.html";
               })
               .catch(error => console.log(error))
         },

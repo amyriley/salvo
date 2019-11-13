@@ -57,8 +57,8 @@
                                     <td class="text-sm-center">{{game.id}}</td>
                                     <td class="text-sm-center">{{game.created}}</td>
                                     <td v-for="gamePlayer in game.gamePlayerIds" class="text-sm-center">
-                                        <a v-if="gamePlayer.email.indexOf(username) > -1 && game.players.length >= 1" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players.join(" vs ")}}</a>
-                                        <a v-else>{{game.players.join(" vs ")}}</a>
+                                        <a v-if="gamePlayer.email.indexOf(username) > -1 && game.players.length >= 1" :href="`/web/game.html?gp=${gamePlayer.id}`">{{game.players}}</a>
+                                        <a v-else>{{game.players}}</a>
                                     </td>
                                     <!-- <td v-for="gamePlayer in game.gamePlayers" class="text-sm-center" style='width: 50px'>
                                         <a>{{gamePlayer.player}}</a>
